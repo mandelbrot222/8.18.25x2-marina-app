@@ -27,14 +27,13 @@ APPOINTMENT_TYPES.forEach(item => {
   TYPE_COLOURS[item.name] = item.color;
 });
 
-// Keep track of which appointment types are currently visible
-const selectedCategories = new Set(APPOINTMENT_TYPES.map(item => item.name));
+// No filtering of appointment types is needed.  All events are always visible.
+// Previously we tracked selected categories to filter events; this has been removed.
 
 // FullCalendar instance for this page
 let scheduleCalendar;
 
-// Mini calendar instance
-window.miniCalendar = null;
+// Mini calendar has been removed; no global reference needed.
 
 /**
  * Convert stored schedule items into FullCalendar event objects.  Each
@@ -91,17 +90,9 @@ function initCalendar() {
       // Start day 0 = Sunday, 6 = Saturday
       return selectInfo.start.getDay() !== 0;
     },
-    // Keep mini calendar in sync when main calendar dates change
-    datesSet: function (info) {
-      if (window.miniCalendar) {
-        window.miniCalendar.gotoDate(info.start);
-      }
-    },
+    // When the calendar date range changes we used to sync the mini calendar; no longer needed.
     eventDidMount: function (info) {
-      const type = info.event.extendedProps.appointmentType;
-      if (!selectedCategories.has(type)) {
-        info.event.setProp('display', 'none');
-      }
+      // Colour assignment is already handled by the event definition. No filtering here.
     },
     select: function(info) {
       // Called when the user selects a timeslot. We'll open the modal for a new appointment.
@@ -125,11 +116,7 @@ function refreshCalendar() {
     const events = transformSchedulesToEvents();
     scheduleCalendar.removeAllEvents();
     events.forEach(ev => {
-      const eventObj = scheduleCalendar.addEvent(ev);
-      // Hide if not selected
-      if (!selectedCategories.has(ev.extendedProps.appointmentType)) {
-        eventObj.setProp('display', 'none');
-      }
+      scheduleCalendar.addEvent(ev);
     });
   }
 }
@@ -139,25 +126,8 @@ function refreshCalendar() {
  * refreshes the calendar events once complete.
  */
 function renderSchedules() {
-  const list = getItems(SCHEDULE_KEY);
-  const ul = document.getElementById('schedule-list');
-  if (ul) {
-    ul.innerHTML = '';
-    list.forEach((item, index) => {
-      const li = document.createElement('li');
-      // Format list entry
-      const text = `${item.startDate} ${item.startTime}–${item.endDate} ${item.endTime}: ${item.description} (${item.appointmentType}) for ${item.name}`;
-      li.textContent = text;
-      const btn = document.createElement('button');
-      btn.textContent = 'Delete';
-      btn.addEventListener('click', () => {
-        deleteItem(SCHEDULE_KEY, index);
-        renderSchedules();
-      });
-      li.appendChild(btn);
-      ul.appendChild(li);
-    });
-  }
+  // In this simplified version, we no longer display a list of appointments.
+  // We simply refresh the events on the calendar to reflect any additions or edits.
   refreshCalendar();
 }
 
@@ -345,28 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
 initCalendar();
 renderSchedules();
 
-// Initialise mini calendar for date navigation
-function initMiniCalendar() {
-  const miniEl = document.getElementById('mini-calendar');
-  if (!miniEl) return;
-  window.miniCalendar = new FullCalendar.Calendar(miniEl, {
-    initialView: 'dayGridMonth',
-    headerToolbar: {
-      left: '',
-      center: 'title',
-      right: ''
-    },
-    events: [],
-    selectable: true,
-    height: 'auto',
-    dateClick: function (info) {
-      if (scheduleCalendar) {
-        scheduleCalendar.gotoDate(info.date);
-      }
-    }
-  });
-  window.miniCalendar.render();
-}
+// Mini calendar functionality has been removed.
 
 // Render the legend of appointment types with checkboxes for filtering
 function renderLegend() {
@@ -379,25 +328,11 @@ function renderLegend() {
   APPOINTMENT_TYPES.forEach(item => {
     const wrap = document.createElement('div');
     wrap.className = 'legend-item';
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.checked = true;
-    checkbox.dataset.type = item.name;
-    checkbox.addEventListener('change', (e) => {
-      const type = e.target.dataset.type;
-      if (e.target.checked) {
-        selectedCategories.add(type);
-      } else {
-        selectedCategories.delete(type);
-      }
-      refreshCalendarDisplay();
-    });
     const colourBox = document.createElement('span');
     colourBox.className = 'legend-color';
     colourBox.style.backgroundColor = item.color;
     const label = document.createElement('span');
     label.textContent = item.name;
-    wrap.appendChild(checkbox);
     wrap.appendChild(colourBox);
     wrap.appendChild(label);
     legendEl.appendChild(wrap);
@@ -405,20 +340,9 @@ function renderLegend() {
 }
 
 // Refresh event visibility according to selected categories
-function refreshCalendarDisplay() {
-  if (!scheduleCalendar) return;
-  scheduleCalendar.getEvents().forEach(ev => {
-    const type = ev.extendedProps.appointmentType;
-    if (selectedCategories.has(type)) {
-      ev.setProp('display', 'auto');
-    } else {
-      ev.setProp('display', 'none');
-    }
-  });
-}
+// No need for refreshCalendarDisplay when filtering is removed.
 
 // There is no static appointment form now, so no need to populate select at load.
 
-// Initialise mini calendar and legend on load
-initMiniCalendar();
+// Initialise legend on load
 renderLegend();
