@@ -66,6 +66,7 @@ function initCalendar() {
   scheduleCalendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'timeGridWeek',
     height: 'auto',
+    dayHeaderFormat: { weekday: 'short', month: 'numeric', day: 'numeric' },
     events: transformSchedulesToEvents(),
     headerToolbar: {
       left: 'prev,next today',
