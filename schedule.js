@@ -13,11 +13,11 @@ const SCHEDULE_KEY = 'schedules';
 // Define appointment categories and their colours
 const APPOINTMENT_TYPES = [
   { name: 'Launch', color: '#007F7E' },
-  { name: 'Winter Haul In', color: '#4577D5' },
+  { name: 'Water Haul In', color: '#4577D5' },
   { name: 'Winter Storage Removal', color: '#C11A44' },
-  { name: 'Trailer Storage Drop Off', color: '#EBCB00' },
-  { name: 'Boat Viewing', color: '#8F4E9F' },
-  { name: 'Trailer Storage Pickup', color: '#F58220' },
+  { name: 'Winter Storage Intake', color: '#EBCB00' },
+  { name: 'Trailer Storage Removal', color: '#8F4E9F' },
+  { name: 'Trailer Storage Intake', color: '#F58220' },
   { name: 'Other', color: '#7A7A7A' }
 ];
 
