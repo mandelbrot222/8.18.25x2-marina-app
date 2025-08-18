@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Portal – Menu</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <!-- Header with logo and portal title -->
+  <header class="app-header">
+    <img src="assets/narrows_logo.png" alt="Narrows Marina logo" class="logo">
+    <h2>Narrows Marina Portal</h2>
+  </header>
+
+  <div class="container">
+    <h1>Main Menu</h1>
+    <ul class="menu-list">
+      <li><a href="schedule.html">Boat/Trailer Schedule</a></li>
+      <li><a href="employees.html">Employee Schedule</a></li>
+      <li><a href="maintenance.html">Maintenance Requests</a></li>
+      <li><a href="moveouts.html">Move Outs</a></li>
+      <li><button id="logout">Logout</button></li>
+    </ul>
+  </div>
+
+  <script src="common.js"></script>
+  <script>
+    // Protect the page from unauthorised access
+    ensureLoggedIn();
+    // Logout handler
+    document.getElementById('logout').addEventListener('click', function () {
+      logout();
+    });
+  </script>
+</body>
+</html>

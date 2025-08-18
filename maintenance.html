@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maintenance Requests</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <!-- Global header -->
+  <header class="app-header">
+    <img src="assets/narrows_logo.png" alt="Narrows Marina logo" class="logo">
+    <h2>Narrows Marina Portal</h2>
+  </header>
+
+  <div class="container">
+    <h1>Maintenance Requests</h1>
+    <!-- Form to add a new maintenance request -->
+    <form id="maintenance-form">
+      <label for="maintenance-date">Date
+        <input type="date" id="maintenance-date" required>
+      </label>
+      <label for="maintenance-desc">Description
+        <input type="text" id="maintenance-desc" placeholder="Problem description" required>
+      </label>
+      <label for="maintenance-priority">Priority
+        <select id="maintenance-priority">
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+      </label>
+      <button type="submit">Add Request</button>
+    </form>
+
+    <!-- List of maintenance requests -->
+    <ul id="maintenance-list"></ul>
+
+    <a href="menu.html" class="back-link">Back to Menu</a>
+  </div>
+
+  <script src="common.js"></script>
+  <script src="maintenance.js"></script>
+</body>
+</html>

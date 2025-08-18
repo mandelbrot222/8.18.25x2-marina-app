@@ -1,0 +1,324 @@
+/*
+ * Basic styling for the company portal.  This stylesheet defines
+ * consistent layout rules across all pages and provides a simple,
+ * modern look.  Feel free to adjust colours, fonts or spacing to
+ * suit your business branding.
+ */
+
+/*
+ * Updated Narrows Marina portal stylesheet
+ *
+ * The colours used here are inspired by the Narrows Marina brand palette
+ * (teal, purple, charcoal and light aqua) and the modern feel of
+ * Robinhood's app. CSS variables are defined at the root for easy
+ * theme adjustments.  Buttons, cards and headers leverage these colours
+ * and a subtle shadow to give a clean, friendly look.
+ */
+
+/* Colour palette variables */
+:root {
+  --colour-background: #CDEFEF;   /* light aqua from Narrows Marina site */
+  --colour-card-bg: #ffffff;       /* card backgrounds */
+  --colour-primary: #007F7E;       /* teal accent */
+  --colour-secondary: #613977;     /* purple accent */
+  --colour-charcoal: #787877;      /* charcoal text */
+  --colour-error: #dc3545;         /* red for errors */
+  --colour-hover: #016667;         /* darker teal for hover state */
+  --colour-button-hover: #512d66;  /* darker purple for hover state */
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: var(--colour-background);
+  color: var(--colour-charcoal);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Global header containing logo and title */
+.app-header {
+  background: var(--colour-primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.app-header .logo {
+  height: 40px;
+  width: 40px;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.app-header h2 {
+  font-size: 1.5rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Main content wrapper */
+.container {
+  width: 100%;
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 20px;
+  background: var(--colour-card-bg);
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--colour-primary);
+  font-size: 1.8rem;
+}
+
+form label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+form input[type="text"],
+form input[type="password"],
+form input[type="date"],
+form input[type="time"],
+form select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 4px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+button {
+  background: var(--colour-secondary);
+  color: #ffffff;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 1rem;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background: var(--colour-button-hover);
+}
+
+.error {
+  color: var(--colour-error);
+  margin-top: 10px;
+}
+
+/* Menu styles */
+.menu-list {
+  list-style: none;
+  padding: 0;
+}
+
+.menu-list li {
+  margin-bottom: 15px;
+}
+
+.menu-list li a,
+.menu-list li button {
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--colour-primary);
+  color: #ffffff;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  transition: background 0.2s ease;
+}
+
+.menu-list li a:hover,
+.menu-list li button:hover {
+  background: var(--colour-hover);
+}
+
+/* Lists on data pages */
+ul#schedule-list li,
+ul#employees-list li,
+ul#maintenance-list li,
+ul#moveouts-list li {
+  position: relative;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px 50px 10px 12px;
+  margin-bottom: 10px;
+  word-break: break-word;
+  font-size: 0.95rem;
+}
+
+ul#schedule-list li button,
+ul#employees-list li button,
+ul#maintenance-list li button,
+ul#moveouts-list li button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--colour-error);
+  color: #ffffff;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s ease;
+}
+
+ul#schedule-list li button:hover,
+ul#employees-list li button:hover,
+ul#maintenance-list li button:hover,
+ul#moveouts-list li button:hover {
+  background: #a71d2a;
+}
+
+/* Back link styling */
+.back-link {
+  display: inline-block;
+  margin-top: 20px;
+  color: var(--colour-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+  color: var(--colour-hover);
+}
+
+/* Calendar container styling */
+#calendar,
+#employee-calendar,
+.mini-calendar {
+  margin-top: 20px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Grey out Sunday in the main calendar */
+.fc-day-sun, .fc-timegrid-col.fc-day-sun {
+  background-color: #f6f6f6;
+}
+
+/* Layout for schedule pages with a sidebar */
+.schedule-layout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.schedule-layout > .calendar-container {
+  flex: 3;
+  min-width: 0;
+}
+
+.schedule-layout > .sidebar {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Legend styling */
+.legend {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.legend h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  color: var(--colour-primary);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+
+.legend-item:last-child {
+  margin-bottom: 0;
+}
+
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  margin-right: 8px;
+}
+
+.legend-item input[type="checkbox"] {
+  margin-right: 6px;
+}
+
+/* Modal overlay for creating/editing appointments */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.modal-content {
+  background: var(--colour-card-bg);
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  width: 100%;
+  max-width: 500px;
+  box-sizing: border-box;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: var(--colour-primary);
+  font-size: 1.4rem;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.modal-buttons button {
+  flex: 1;
+}

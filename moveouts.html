@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Move Outs</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <!-- Global header -->
+  <header class="app-header">
+    <img src="assets/narrows_logo.png" alt="Narrows Marina logo" class="logo">
+    <h2>Narrows Marina Portal</h2>
+  </header>
+
+  <div class="container">
+    <h1>Move Outs</h1>
+    <!-- Form to record a move out -->
+    <form id="moveout-form">
+      <label for="moveout-name">Occupant Name
+        <input type="text" id="moveout-name" placeholder="Name" required>
+      </label>
+      <label for="moveout-date">Move Out Date
+        <input type="date" id="moveout-date" required>
+      </label>
+      <label for="moveout-notes">Notes
+        <input type="text" id="moveout-notes" placeholder="Notes" />
+      </label>
+      <button type="submit">Add Move Out</button>
+    </form>
+
+    <!-- List of move outs -->
+    <ul id="moveouts-list"></ul>
+
+    <a href="menu.html" class="back-link">Back to Menu</a>
+  </div>
+
+  <script src="common.js"></script>
+  <script src="moveouts.js"></script>
+</body>
+</html>

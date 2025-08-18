@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Portal – Login</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Link to the PWA manifest -->
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <!-- Application header with logo and title -->
+  <header class="app-header">
+    <img src="assets/narrows_logo.png" alt="Narrows Marina logo" class="logo">
+    <h2>Narrows Marina Portal</h2>
+  </header>
+
+  <div class="container">
+    <h1>Login</h1>
+    <!-- Login form -->
+    <form id="login-form">
+      <label for="username">Username</label>
+      <input type="text" id="username" required>
+
+      <label for="password">Password</label>
+      <input type="password" id="password" required>
+
+      <button type="submit">Login</button>
+    </form>
+    <p id="login-error" class="error"></p>
+  </div>
+
+  <script src="common.js"></script>
+  <script>
+    // Attach login handler to the form
+    document.getElementById('login-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      login();
+    });
+  </script>
+</body>
+</html>

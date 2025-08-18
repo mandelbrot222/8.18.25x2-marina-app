@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Schedule</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <!-- FullCalendar styles via CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css">
+</head>
+<body>
+  <!-- Global header -->
+  <header class="app-header">
+    <img src="assets/narrows_logo.png" alt="Narrows Marina logo" class="logo">
+    <h2>Narrows Marina Portal</h2>
+  </header>
+
+  <div class="container">
+    <h1>Employee Schedule</h1>
+    <!-- Form to add a new employee schedule -->
+    <form id="employee-form">
+      <label for="employee-name">Employee Name
+        <input type="text" id="employee-name" placeholder="Name" required>
+      </label>
+      <label for="employee-date">Date
+        <input type="date" id="employee-date" required>
+      </label>
+      <label for="employee-start">Start Time
+        <input type="time" id="employee-start" required>
+      </label>
+      <label for="employee-end">End Time
+        <input type="time" id="employee-end" required>
+      </label>
+      <label for="employee-notes">Notes
+        <input type="text" id="employee-notes" placeholder="Shift notes" />
+      </label>
+      <button type="submit">Add Schedule</button>
+    </form>
+
+    <!-- Layout for calendar and sidebar -->
+    <div class="schedule-layout">
+      <div class="calendar-container">
+        <!-- Calendar view for employees -->
+        <div id="employee-calendar"></div>
+      </div>
+      <aside class="sidebar">
+        <!-- Mini date picker for employees -->
+        <div id="employee-mini-calendar" class="mini-calendar"></div>
+      </aside>
+    </div>
+
+    <!-- List of employee schedules -->
+    <ul id="employees-list"></ul>
+
+    <a href="menu.html" class="back-link">Back to Menu</a>
+  </div>
+
+  <script src="common.js"></script>
+  <!-- FullCalendar script via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script src="employees.js"></script>
+</body>
+</html>

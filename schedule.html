@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedule Boat/Trailer Move</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <!-- FullCalendar styles via CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css">
+</head>
+<body>
+  <!-- Global header -->
+  <header class="app-header">
+    <img src="assets/narrows_logo.png" alt="Narrows Marina logo" class="logo">
+    <h2>Narrows Marina Portal</h2>
+  </header>
+
+  <div class="container">
+    <h1>Boat/Trailer Schedule</h1>
+    <!-- Hidden modal for creating or editing appointments -->
+    <div id="appointment-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <h3 id="modal-title">New Appointment</h3>
+        <form id="modal-form">
+          <label for="modal-start">Start Time
+            <!-- Start is displayed in human readable format, disabled to prevent manual editing -->
+            <input type="text" id="modal-start" disabled>
+          </label>
+          <label for="modal-desc">Description
+            <input type="text" id="modal-desc" placeholder="Purpose of appointment" required>
+          </label>
+          <label for="modal-name">Full Name
+            <input type="text" id="modal-name" placeholder="Customer name" required>
+          </label>
+          <label for="modal-type">Appointment Type
+            <select id="modal-type" required></select>
+          </label>
+          <div class="modal-buttons">
+            <button type="submit" id="modal-save">Save</button>
+            <button type="button" id="modal-delete" style="display:none;">Delete</button>
+            <button type="button" id="modal-cancel">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Schedule layout containing main calendar and sidebar -->
+    <div class="schedule-layout">
+      <div class="calendar-container">
+        <!-- Calendar view -->
+        <div id="calendar"></div>
+      </div>
+      <aside class="sidebar">
+        <!-- Mini date picker/calendar -->
+        <div id="mini-calendar" class="mini-calendar"></div>
+        <!-- Legend for appointment types -->
+        <div id="legend" class="legend"></div>
+      </aside>
+    </div>
+
+    <!-- List of scheduled moves -->
+    <ul id="schedule-list"></ul>
+
+    <a href="menu.html" class="back-link">Back to Menu</a>
+  </div>
+
+  <script src="common.js"></script>
+  <!-- FullCalendar script via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script src="schedule.js"></script>
+</body>
+</html>
