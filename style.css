@@ -292,6 +292,11 @@ ul#moveouts-list li button:hover {
   white-space: normal;
 }
 
+.fc-col-header .fc-col-header-cell .fc-col-header-cell-cushion {
+  white-space: normal !important;
+  line-height: 1.1;
+}
+
 /* Modal overlay for creating/editing appointments */
 .modal {
   position: fixed;
