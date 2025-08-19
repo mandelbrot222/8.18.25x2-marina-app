@@ -279,21 +279,10 @@ ul#moveouts-list li button:hover {
   margin-right: 6px;
 }
 
-/*
- * Format the weekday header in the schedule calendar so that the day and date
- * are always stacked vertically. By default, FullCalendar sometimes places
- * the date to the right of the day when space is constrained. These rules
- * ensure the day appears above the date for consistency across all columns.
- */
-.fc-col-header-cell-cushion {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  white-space: normal;
-}
-
-.fc-col-header .fc-col-header-cell .fc-col-header-cell-cushion {
-  white-space: normal !important;
+.fc .fc-col-header-cell .fc-col-header-cell-cushion {
+  white-space: pre-line !important;  /* turns \n into a real line break */
+  display: block;                    /* avoid flex quirks that can cause side-by-side text */
+  text-align: center;
   line-height: 1.1;
 }
 
