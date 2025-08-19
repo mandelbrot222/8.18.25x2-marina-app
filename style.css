@@ -280,21 +280,36 @@ ul#moveouts-list li button:hover {
 }
 
 /*
- * Format the weekday header in the schedule calendar so that the day and date
- * are always stacked vertically. By default, FullCalendar sometimes places
- * the date to the right of the day when space is constrained. These rules
- * ensure the day appears above the date for consistency across all columns.
+ * Ensure the weekday headers in the FullCalendar weekly view are
+ * consistently formatted.  Without these overrides, FullCalendar will
+ * sometimes wrap the date onto a second line only when a column is
+ * narrow, which results in a mixture of one‑line and two‑line headers
+ * across the same view.  To avoid this and provide a uniform
+ * appearance, we force the header cushion to use a vertical layout
+ * (day on the first line, date on the second) for every column.  The
+ * use of `!important` ensures these rules take precedence over the
+ * library’s default styles.
  */
 .fc-col-header-cell-cushion {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  white-space: normal;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: normal !important;
+  line-height: 1.1 !important;
 }
 
+/*
+ * The following selector specifically targets the nested cushion
+ * elements within each header cell.  It repeats the `white-space` and
+ * `line-height` rules with `!important` to override any inline styles
+ * that FullCalendar may inject.  This helps prevent the day and date
+ * text from running together or wrapping inconsistently when space is
+ * constrained.
+ */
 .fc-col-header .fc-col-header-cell .fc-col-header-cell-cushion {
   white-space: normal !important;
-  line-height: 1.1;
+  line-height: 1.1 !important;
 }
 
 /* Modal overlay for creating/editing appointments */
