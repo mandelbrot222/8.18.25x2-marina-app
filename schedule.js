@@ -66,6 +66,12 @@ function initCalendar() {
   scheduleCalendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'timeGridWeek',
     height: 'auto',
+    dayHeaderContent: (arg) => {
+      const dow = arg.date.toLocaleDateString(undefined, { weekday: 'short' }); // e.g., Mon
+      const md  = arg.date.toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' }); // e.g., 8/18
+      // Return a single text value with a newline; CSS below will render the newline as a line break
+      return { text: `${dow}\n${md}` };
+    },
     dayHeaderFormat: { weekday: 'short', month: 'numeric', day: 'numeric' },
     events: transformSchedulesToEvents(),
     headerToolbar: {
