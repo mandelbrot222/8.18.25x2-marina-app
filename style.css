@@ -340,3 +340,21 @@ ul#moveouts-list li button:hover {
 .modal-buttons button {
   flex: 1;
 }
+
+/* === Minimal additions for uniform two-line calendar header === */
+.fc-col-header-cell-cushion,
+.fc-col-header-cell-cushion > a {
+  display: block;
+  white-space: normal !important;
+  text-align: center;
+}
+
+.nm-dow {                 /* top line: day of week */
+  display: block;
+  font-weight: 600;
+}
+
+.nm-date {                /* bottom line: numeric date */
+  display: block;
+  opacity: 0.9;
+}
