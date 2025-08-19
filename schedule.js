@@ -66,7 +66,16 @@ function initCalendar() {
   scheduleCalendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'timeGridWeek',
     height: 'auto',
-    dayHeaderFormat: { weekday: 'short', month: 'numeric', day: 'numeric' },
+
+    // Force a consistent two-line header (Day above Date)
+    dayHeaderContent: (arg) => {
+      const dow = arg.date.toLocaleDateString([], { weekday: 'short' }); // e.g., Tue
+      const m = String(arg.date.getMonth() + 1);
+      const d = String(arg.date.getDate());
+      return { html: `<div class="nm-dow">${dow}</div><div class="nm-date">${m}/${d}</div>` };
+    },
+    // (Removed previous: dayHeaderFormat)
+
     events: transformSchedulesToEvents(),
     headerToolbar: {
       left: 'prev,next today',
