@@ -1,64 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Employee Schedule</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
-  <!-- FullCalendar styles via CDN -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css">
-</head>
-<body>
-  <!-- Global header -->
-  <header class="app-header">
-    <img src="assets/narrows_logo.png" alt="Narrows Marina logo" class="logo">
-    <h2>Narrows Marina Portal</h2>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Employee Schedule</title>
+    <link rel="stylesheet" href="style.css" />
+    <!-- FullCalendar -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <script src="common.js"></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <img src="icons/icon-192x192.png" class="logo" alt="Narrows Marina" />
+      <h2>Narrows Marina Portal</h2>
+    </header>
 
-  <div class="container">
-    <h1>Employee Schedule</h1>
-    <!-- Form to add a new employee schedule -->
-    <form id="employee-form">
-      <label for="employee-name">Employee Name
-        <input type="text" id="employee-name" placeholder="Name" required>
-      </label>
-      <label for="employee-date">Date
-        <input type="date" id="employee-date" required>
-      </label>
-      <label for="employee-start">Start Time
-        <input type="time" id="employee-start" required>
-      </label>
-      <label for="employee-end">End Time
-        <input type="time" id="employee-end" required>
-      </label>
-      <label for="employee-notes">Notes
-        <input type="text" id="employee-notes" placeholder="Shift notes" />
-      </label>
-      <button type="submit">Add Schedule</button>
-    </form>
+    <main class="container">
+      <h1>Employee Schedule</h1>
 
-    <!-- Layout for calendar and sidebar -->
-    <div class="schedule-layout">
-      <div class="calendar-container">
-        <!-- Calendar view for employees -->
-        <div id="employee-calendar"></div>
+      <div class="schedule-layout">
+        <section class="calendar-container">
+          <div id="employee-calendar"></div>
+        </section>
+
+        <aside class="sidebar">
+          <div class="legend" id="emp-legend">
+            <h3>Employees &amp; Roles</h3>
+            <div id="emp-legend-list" aria-live="polite"></div>
+          </div>
+
+          <div class="legend">
+            <h3>Actions</h3>
+            <button id="btn-request-off">Request Time Off</button>
+            <button id="btn-export-week">Export Week</button>
+          </div>
+
+          <div class="legend" id="admin-panel" style="display:none;">
+            <h3>Admin: Annual Totals</h3>
+            <label for="adminYear">Year</label>
+            <select id="adminYear"></select>
+            <div id="adminTotals" style="max-height:220px; overflow:auto; margin-top:8px;"></div>
+            <button id="btn-export-admin">Export CSV</button>
+          </div>
+        </aside>
       </div>
-      <aside class="sidebar">
-        <!-- Mini date picker for employees -->
-        <div id="employee-mini-calendar" class="mini-calendar"></div>
-      </aside>
+
+      <a class="back-link" href="menu.html">Back to Menu</a>
+    </main>
+
+    <!-- Request Time Off Modal -->
+    <div class="modal" id="request-modal" style="display:none;">
+      <div class="modal-content">
+        <h3>Request Time Off</h3>
+        <form id="request-form">
+          <label>
+            Type
+            <select id="req-type" required>
+              <option value="PTO">Vacation / PTO</option>
+              <option value="SICK">Sick (WA Paid Sick Leave)</option>
+              <option value="PFML">PFML / Protected Leave</option>
+            </select>
+          </label>
+
+          <label>
+            Employee
+            <select id="req-employee" required></select>
+          </label>
+
+          <label>
+            Full Day(s)?
+            <select id="req-fullday">
+              <option value="yes" selected>Yes</option>
+              <option value="no">No (enter hours)</option>
+            </select>
+          </label>
+
+          <div id="req-date-block">
+            <label>Start</label>
+            <input type="date" id="req-start-date" required />
+            <input type="time" id="req-start-time" value="08:00" />
+            <label>End</label>
+            <input type="date" id="req-end-date" required />
+            <input type="time" id="req-end-time" value="16:00" />
+          </div>
+
+          <label>
+            Notes (optional)
+            <input type="text" id="req-notes" placeholder="Reason or context (no medical details)" />
+          </label>
+
+          <div class="modal-buttons">
+            <button type="submit">Submit</button>
+            <button type="button" id="req-cancel">Cancel</button>
+          </div>
+        </form>
+      </div>
     </div>
 
-    <!-- List of employee schedules -->
-    <ul id="employees-list"></ul>
-
-    <a href="menu.html" class="back-link">Back to Menu</a>
-  </div>
-
-  <script src="common.js"></script>
-  <!-- FullCalendar script via CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-  <script src="employees.js"></script>
-</body>
+    <script src="employees.js"></script>
+  </body>
 </html>
