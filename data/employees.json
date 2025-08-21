@@ -1,0 +1,65 @@
+[
+  {
+    "id": "E01",
+    "name": "Haak Wagner",
+    "position": "General Manager",
+    "color": "#4577D5",
+    "ptoHours": 40,
+    "pslHours": 24,
+    "isActive": true
+  },
+  {
+    "id": "E02",
+    "name": "Karli Rich",
+    "position": "Office Manager",
+    "color": "#007F7E",
+    "ptoHours": 24,
+    "pslHours": 16,
+    "isActive": true
+  },
+  {
+    "id": "E03",
+    "name": "Tony Piggot",
+    "position": "Marina Operations",
+    "color": "#8F4E9F",
+    "ptoHours": 16,
+    "pslHours": 40,
+    "isActive": true
+  },
+  {
+    "id": "E04",
+    "name": "Bri Ghallager",
+    "position": "Store Lead",
+    "color": "#F58220",
+    "ptoHours": 32,
+    "pslHours": 24,
+    "isActive": true
+  },
+  {
+    "id": "E05",
+    "name": "Marvin Stohs",
+    "position": "Marina Repairs",
+    "color": "#F58220",
+    "ptoHours": 32,
+    "pslHours": 24,
+    "isActive": true
+  },
+  {
+    "id": "E06",
+    "name": "Mitchel French",
+    "position": "Marina Repairs & Operations",
+    "color": "#F58220",
+    "ptoHours": 32,
+    "pslHours": 24,
+    "isActive": true
+  },
+  {
+    "id": "E07",
+    "name": "Leanne Layton",
+    "position": "Weekend Store Lead",
+    "color": "#F58220",
+    "ptoHours": 32,
+    "pslHours": 24,
+    "isActive": true
+  }
+]

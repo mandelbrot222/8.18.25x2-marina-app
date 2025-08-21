@@ -6,6 +6,7 @@
  *    SICK (WA PSL): allow only up to accrued sick hours; if >3 days, flag verification notice
  *    PFML: create record as 'pending' (manager processes offline)
  * - Admin panel: year totals (requested/approved/taken) by employee
+ * - NEW: optional roster sync from data/employees.json (writes to localStorage)
  */
 
 // ===== Setup & Utilities =====
@@ -34,8 +35,6 @@ function getCurrentUserId() {
   return localStorage.getItem('currentUserId') || null;
 }
 
-function parseISO(s) { return new Date(s); }
-function fmtISO(d) { return new Date(d).toISOString(); }
 function ymd(d) {
   const dt = new Date(d);
   return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
@@ -62,22 +61,29 @@ function getList(key) {
   } catch {}
   return JSON.parse(localStorage.getItem(key) || '[]');
 }
-function saveToList(key, obj) {
-  try {
-    if (typeof saveItem === 'function') return saveItem(key, obj);
-  } catch {}
-  const list = getList(key);
-  list.push(obj);
-  localStorage.setItem(key, JSON.stringify(list));
-  return true;
-}
 function setList(key, array) {
   localStorage.setItem(key, JSON.stringify(array || []));
 }
 
-// ===== Data Load =====
-const EMPLOYEES = getList(EMPLOYEES_KEY); // array of {id, name, position, color, ptoHours, pslHours}
-const TIME_OFF = getList(TIME_OFF_KEY);    // array of request records
+// ===== Data Load (now mutable due to roster sync) =====
+let EMPLOYEES = getList(EMPLOYEES_KEY); // was const; now let so we can refresh after fetch
+const TIME_OFF = getList(TIME_OFF_KEY);  // not mutated here
+
+// ===== Optional roster sync from data/employees.json =====
+async function syncEmployeesFromFile() {
+  try {
+    const res = await fetch('data/employees.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('fetch failed');
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      localStorage.setItem(EMPLOYEES_KEY, JSON.stringify(data));
+      EMPLOYEES = getList(EMPLOYEES_KEY); // refresh in-memory
+    }
+  } catch (e) {
+    // Offline or file missing: keep existing localStorage values
+    console.warn('Roster sync skipped:', e.message || e);
+  }
+}
 
 // ===== Calendar =====
 let empCalendar = null;
@@ -396,8 +402,7 @@ function buildAdminCSV(year) {
   lines.push(['Year', 'Employee', 'Position', 'Requested (hrs)', 'Approved (hrs)', 'Taken (hrs)'].join(','));
   const el = document.createElement('div');
   el.innerHTML = document.getElementById('adminTotals').innerHTML;
-  // Simple parsing from current DOM rows:
-  const rows = Array.from(el.querySelectorAll('div')).slice(1); // skip header grid
+  const rows = Array.from(el.querySelectorAll('div')).slice(1); // skip header
   rows.forEach(row => {
     const cols = row.querySelectorAll('div');
     if (cols.length < 5) return;
@@ -421,7 +426,7 @@ function csvEscape(s) {
   return s;
 }
 
-function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;","\">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
 
 // ===== Request Handling =====
 function handleRequestSubmit(e) {
@@ -508,7 +513,10 @@ function exportCurrentWeek() {
 }
 
 // ===== Wire up DOM =====
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // NEW: try to sync roster from file first (no-op if file missing/offline)
+  await syncEmployeesFromFile();
+
   // Calendar + legend
   initCalendar();
   renderLegend();
