@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login • Narrows Marina</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="login.js"></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <img src="icons/icon-192x192.png" class="logo" alt="Narrows Marina" />
+      <h2>Narrows Marina Portal</h2>
+    </header>
+
+    <main class="container" style="max-width:700px;">
+      <h1>Employee Login</h1>
+      <p>Username is your full name as it appears in the roster (not case sensitive). Password is <code>Marina1</code> for now.</p>
+      <form id="login-form" class="card" style="padding:16px; display:grid; gap:12px; max-width:520px;">
+        <label>
+          Name
+          <input id="login-name" type="text" placeholder="e.g., Haak Wagner" list="roster" autocomplete="name" required />
+        </label>
+
+        <label>
+          Password
+          <input id="login-pass" type="password" placeholder="Marina1" required />
+        </label>
+
+        <datalist id="roster"></datalist>
+
+        <div style="display:flex; gap:8px;">
+          <button type="submit">Sign In</button>
+          <a href="menu.html" class="button button-secondary">Cancel</a>
+        </div>
+
+        <div id="login-msg" role="alert" style="color:#b00020;"></div>
+      </form>
+    </main>
+  </body>
+</html>
