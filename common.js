@@ -8,8 +8,8 @@
 // a server or database; here we seed a single admin user to get you
 // started.  Modify or extend this array to add additional employees.
 const defaultUsers = [
-  { username: 'admin', password: 'password' }
-  { username: 'Karli Rich', password: 'Marina1' }
+  { username: 'admin', password: 'password' },
+  { username: 'Karli Rich', password: 'Marina1' },
   { username: 'Bri Ghallager', password: 'Marina1' }
 ];
 
