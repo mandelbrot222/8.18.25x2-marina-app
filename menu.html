@@ -1,38 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Company Portal – Menu</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
-</head>
-<body>
-  <!-- Header with logo and portal title -->
-  <header class="app-header">
-    <img src="assets/narrows_logo.png" alt="Narrows Marina logo" class="logo">
-    <h2>Narrows Marina Portal</h2>
-  </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Company Portal – Menu</title>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="icons/icon-192x192.png" />
+    <meta name="theme-color" content="#0B4F6C" />
+  </head>
+  <body>
+    <header class="app-header">
+      <img src="icons/icon-192x192.png" alt="Narrows Marina logo" class="logo" />
+      <h2>Narrows Marina Portal</h2>
+    </header>
 
-  <div class="container">
-    <h1>Main Menu</h1>
-    <ul class="menu-list">
-      <li><a href="schedule.html">Boat/Trailer Schedule</a></li>
-      <li><a href="employees.html">Employee Schedule</a></li>
-      <li><a href="maintenance.html">Maintenance Requests</a></li>
-      <li><a href="moveouts.html">Move Outs</a></li>
-      <li><button id="logout">Logout</button></li>
-    </ul>
-  </div>
+    <main class="container">
+      <h1>Main Menu</h1>
+      <nav class="card" style="display:grid; gap:10px; max-width:520px; padding:16px;">
+        <a class="button" href="schedule.html">Boat/Trailer Schedule</a>
+        <a class="button" href="employees.html">Employee Schedule</a>
+        <a class="button" href="maintenance.html">Maintenance Requests</a>
+        <a class="button" href="moveouts.html">Move Outs</a>
+        <button id="logout-btn" class="button button-secondary" type="button">Logout</button>
+      </nav>
+    </main>
 
-  <script src="common.js"></script>
-  <script>
-    // Protect the page from unauthorised access
-    ensureLoggedIn();
-    // Logout handler
-    document.getElementById('logout').addEventListener('click', function () {
-      logout();
-    });
-  </script>
-</body>
+    <!-- Existing scripts -->
+    <script defer src="common.js"></script>
+
+    <!-- Added line: routes legacy links, protects menu if not logged in, and wires Logout -->
+    <script defer src="menu-fix.js"></script>
+
+    <!-- (Optional) SW registration if you already had it elsewhere -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        try { navigator.serviceWorker.register('service-worker.js'); } catch (e) {}
+      }
+    </script>
+  </body>
 </html>
