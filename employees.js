@@ -205,10 +205,8 @@ function populateRequestEmployees() {
   });
   if (curId && EMPLOYEES.some(e => String(e.id) === String(curId))) {
     sel.value = curId;
-    if (!isAdmin()) sel.disabled = true;
-  } else {
-    sel.disabled = isAdmin() ? false : (EMPLOYEES.length <= 1 ? false : true);
   }
+  sel.disabled = false;
 }
 
 function toggleTimeInputs() {
