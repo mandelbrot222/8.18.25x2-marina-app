@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Company Portal – Menu</title>
+    <title>Narrows Marina • Menu</title>
     <link rel="manifest" href="manifest.json" />
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" href="icons/icon-192x192.png" />
@@ -17,26 +17,48 @@
 
     <main class="container">
       <h1>Main Menu</h1>
-      <nav class="card" style="display:grid; gap:10px; max-width:520px; padding:16px;">
-        <a class="button" href="schedule.html">Boat/Trailer Schedule</a>
-        <a class="button" href="employees.html">Employee Schedule</a>
-        <a class="button" href="maintenance.html">Maintenance Requests</a>
-        <a class="button" href="moveouts.html">Move Outs</a>
+      <div class="card" style="display:grid; gap:10px; max-width:520px; padding:16px;">
+        <button id="btn-boat" class="button" type="button">Boat/Trailer Schedule</button>
+        <button id="btn-emp" class="button" type="button">Employee Schedule</button>
+        <button id="btn-maint" class="button" type="button">Maintenance Requests</button>
+        <button id="btn-moveouts" class="button" type="button">Move Outs</button>
         <button id="logout-btn" class="button button-secondary" type="button">Logout</button>
-      </nav>
+      </div>
     </main>
 
-    <!-- Existing scripts -->
+    <!-- Existing shared helpers if needed elsewhere -->
     <script defer src="common.js"></script>
 
-    <!-- Added line: routes legacy links, protects menu if not logged in, and wires Logout -->
-    <script defer src="menu-fix.js"></script>
-
-    <!-- (Optional) SW registration if you already had it elsewhere -->
+    <!-- Inline minimal routing to avoid extra files -->
     <script>
-      if ('serviceWorker' in navigator) {
-        try { navigator.serviceWorker.register('service-worker.js'); } catch (e) {}
-      }
+      (function () {
+        try {
+          // Gate menu behind login
+          if (!localStorage.getItem('currentUserId')) {
+            location.replace('login.html?return=menu.html');
+            return;
+          }
+
+          // Wire buttons to the correct pages
+          document.getElementById('btn-boat').addEventListener('click', function(){ location.assign('schedule.html'); });
+          document.getElementById('btn-emp').addEventListener('click', function(){ location.assign('employees.html'); });
+          document.getElementById('btn-maint').addEventListener('click', function(){ location.assign('maintenance.html'); });
+          document.getElementById('btn-moveouts').addEventListener('click', function(){ location.assign('moveouts.html'); });
+
+          // Logout clears session and returns to login
+          document.getElementById('logout-btn').addEventListener('click', function(){
+            try {
+              localStorage.removeItem('currentUserId');
+              localStorage.removeItem('currentUserName');
+              localStorage.removeItem('currentUserIsAdmin');
+            } catch (e) {}
+            location.replace('login.html?return=menu.html');
+          });
+        } catch (e) {
+          // In the unlikely case of error, send user to login
+          location.replace('login.html?return=menu.html');
+        }
+      })();
     </script>
   </body>
 </html>
