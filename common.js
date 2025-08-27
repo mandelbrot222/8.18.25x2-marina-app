@@ -1,8 +1,7 @@
 /*
- * Shared functions for the company portal.  These routines handle
- * authentication, basic localStorage operations and PWA service worker
- * registration.  Keeping common logic here avoids duplication across
- * multiple pages.
+ * Shared functions for the company portal. These routines handle
+ * authentication and basic localStorage operations. Keeping common
+ * logic here avoids duplication across multiple pages.
  */
 
 // Default user list.  For a real application you should connect to
@@ -101,13 +100,4 @@ function deleteItem(name, index) {
     list.splice(index, 1);
     localStorage.setItem(name, JSON.stringify(list));
   }
-}
-
-// Register the service worker as soon as the script is evaluated
-if ('serviceWorker' in navigator) {
-  // Use `navigator.serviceWorker.register` on page load to ensure the
-  // service worker is installed as soon as possible.
-  navigator.serviceWorker.register('service-worker.js').catch(err => {
-    console.error('Service worker registration failed:', err);
-  });
 }
