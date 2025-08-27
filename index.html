@@ -4,37 +4,21 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Narrows Marina • Redirecting…</title>
+    <!-- No login check here to avoid loops. Always go to the new login page. -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <script>
-      // Kill any existing service workers & caches, THEN redirect.
-      (async function () {
-        try {
-          if ('serviceWorker' in navigator) {
-            const regs = await navigator.serviceWorker.getRegistrations();
-            for (const r of regs) { try { await r.unregister(); } catch(e){} }
-          }
-          if (window.caches) {
-            const keys = await caches.keys();
-            await Promise.all(keys.map(k => caches.delete(k)));
-          }
-        } catch (e) { /* ignore */ }
-
-        try {
-          var loggedIn = !!localStorage.getItem('currentUserId');
-          if (loggedIn) {
-            location.replace('menu.html');
-          } else {
-            location.replace('login.html?return=menu.html');
-          }
-        } catch (e) {
-          location.replace('login.html?return=menu.html');
-        }
+      (function () {
+        var LOGIN = '/8.18.25x2-marina-app/login.html?return=' + encodeURIComponent('/8.18.25x2-marina-app/menu.html');
+        location.replace(LOGIN);
       })();
     </script>
   </head>
   <body>
     <noscript>
       JavaScript is required. Please enable JavaScript and reload this page.
-      <a href="login.html">Go to login</a>
+      <a href="/8.18.25x2-marina-app/login.html">Go to login</a>
     </noscript>
   </body>
 </html>

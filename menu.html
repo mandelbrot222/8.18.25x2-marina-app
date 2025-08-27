@@ -4,14 +4,37 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Narrows Marina • Menu</title>
-    <link rel="manifest" href="manifest.json" />
-    <link rel="stylesheet" href="style.css" />
-    <link rel="icon" href="icons/icon-192x192.png" />
+    <link rel="manifest" href="/8.18.25x2-marina-app/manifest.json" />
+    <link rel="stylesheet" href="/8.18.25x2-marina-app/style.css" />
+    <link rel="icon" href="/8.18.25x2-marina-app/icons/icon-192x192.png" />
     <meta name="theme-color" content="#0B4F6C" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <style>
+      /* Ensure anchors or buttons with .button class look like your buttons */
+      .button {
+        display: inline-block;
+        padding: 12px 16px;
+        border-radius: 8px;
+        background: var(--btn-bg, #0B4F6C);
+        color: white;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        text-align: center;
+        font: inherit;
+      }
+      .button.button-secondary { background: #555; }
+      .card { background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+      .container { max-width: 960px; margin: 0 auto; padding: 16px; }
+      .app-header { display:flex; align-items:center; gap:12px; padding:12px 16px; }
+      .logo { width: 40px; height: 40px; }
+    </style>
   </head>
   <body>
     <header class="app-header">
-      <img src="icons/icon-192x192.png" alt="Narrows Marina logo" class="logo" />
+      <img src="/8.18.25x2-marina-app/icons/icon-192x192.png" alt="Narrows Marina logo" class="logo" />
       <h2>Narrows Marina Portal</h2>
     </header>
 
@@ -26,28 +49,30 @@
       </div>
     </main>
 
-    <!-- Kill any old service worker & caches to prevent stale routing -->
-    <script defer src="sw-kill.js"></script>
-
-    <!-- Minimal routing and login gate -->
     <script>
       (function () {
-        function goLogin() { location.replace('login.html?return=menu.html'); }
+        var BASE = '/8.18.25x2-marina-app/';
+        function go(p) { location.href = BASE + p; }
+        function goLogin() {
+          location.href = BASE + 'login.html?return=' + encodeURIComponent(BASE + 'menu.html');
+        }
+        // Optional guard: if not logged in, send to login
         try {
           if (!localStorage.getItem('currentUserId')) { goLogin(); return; }
         } catch (e) { goLogin(); return; }
 
+        // Wire buttons to absolute paths so GitHub Pages never misroutes
         document.addEventListener('DOMContentLoaded', function(){
-          document.getElementById('btn-boat').addEventListener('click', function(){ location.assign('schedule.html'); });
-          document.getElementById('btn-emp').addEventListener('click', function(){ location.assign('employees.html'); });
-          document.getElementById('btn-maint').addEventListener('click', function(){ location.assign('maintenance.html'); });
-          document.getElementById('btn-moveouts').addEventListener('click', function(){ location.assign('moveouts.html'); });
+          document.getElementById('btn-boat').addEventListener('click', function(){ go('schedule.html'); });
+          document.getElementById('btn-emp').addEventListener('click', function(){ go('employees.html'); });
+          document.getElementById('btn-maint').addEventListener('click', function(){ go('maintenance.html'); });
+          document.getElementById('btn-moveouts').addEventListener('click', function(){ go('moveouts.html'); });
           document.getElementById('logout-btn').addEventListener('click', function(){
             try {
               localStorage.removeItem('currentUserId');
               localStorage.removeItem('currentUserName');
               localStorage.removeItem('currentUserIsAdmin');
-            } catch (e) {}
+            } catch (e) { }
             goLogin();
           });
         });
