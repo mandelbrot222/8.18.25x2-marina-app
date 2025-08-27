@@ -5,7 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Narrows Marina • Redirecting…</title>
     <script>
-      (function () {
+      // Kill any existing service workers & caches, THEN redirect.
+      (async function () {
+        try {
+          if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            for (const r of regs) { try { await r.unregister(); } catch(e){} }
+          }
+          if (window.caches) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => caches.delete(k)));
+          }
+        } catch (e) { /* ignore */ }
+
         try {
           var loggedIn = !!localStorage.getItem('currentUserId');
           if (loggedIn) {

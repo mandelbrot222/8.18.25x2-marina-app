@@ -26,38 +26,32 @@
       </div>
     </main>
 
+    <!-- Kill any old service worker & caches to prevent stale routing -->
+    <script defer src="sw-kill.js"></script>
+
+    <!-- Minimal routing and login gate -->
     <script>
-      // Gate menu behind login
-      (function(){
+      (function () {
+        function goLogin() { location.replace('login.html?return=menu.html'); }
         try {
-          if (!localStorage.getItem('currentUserId')) {
-            location.replace('login.html?return=menu.html');
-            return;
-          }
-        } catch (e) {
-          location.replace('login.html?return=menu.html');
-          return;
-        }
-      })();
-      // Wire buttons
-      document.addEventListener('DOMContentLoaded', function(){
-        document.getElementById('btn-boat').addEventListener('click', function(){ location.assign('schedule.html'); });
-        document.getElementById('btn-emp').addEventListener('click', function(){ location.assign('employees.html'); });
-        document.getElementById('btn-maint').addEventListener('click', function(){ location.assign('maintenance.html'); });
-        document.getElementById('btn-moveouts').addEventListener('click', function(){ location.assign('moveouts.html'); });
-        document.getElementById('logout-btn').addEventListener('click', function(){
-          try {
-            localStorage.removeItem('currentUserId');
-            localStorage.removeItem('currentUserName');
-            localStorage.removeItem('currentUserIsAdmin');
-          } catch (e) {}
-          location.replace('login.html?return=menu.html');
+          if (!localStorage.getItem('currentUserId')) { goLogin(); return; }
+        } catch (e) { goLogin(); return; }
+
+        document.addEventListener('DOMContentLoaded', function(){
+          document.getElementById('btn-boat').addEventListener('click', function(){ location.assign('schedule.html'); });
+          document.getElementById('btn-emp').addEventListener('click', function(){ location.assign('employees.html'); });
+          document.getElementById('btn-maint').addEventListener('click', function(){ location.assign('maintenance.html'); });
+          document.getElementById('btn-moveouts').addEventListener('click', function(){ location.assign('moveouts.html'); });
+          document.getElementById('logout-btn').addEventListener('click', function(){
+            try {
+              localStorage.removeItem('currentUserId');
+              localStorage.removeItem('currentUserName');
+              localStorage.removeItem('currentUserIsAdmin');
+            } catch (e) {}
+            goLogin();
+          });
         });
-      });
-      // Ensure SW is registered (if not already)
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('service-worker.js').catch(()=>{});
-      }
+      })();
     </script>
   </body>
 </html>
