@@ -9,8 +9,12 @@
 // started.  Modify or extend this array to add additional employees.
 const defaultUsers = [
   { username: 'admin', password: 'password' },
+  { username: 'Tony Piggot', password: 'Marina1' },
   { username: 'Karli Rich', password: 'Marina1' },
-  { username: 'Bri Ghallager', password: 'Marina1' }
+  { username: 'Bri Ghallager', password: 'Marina1' },
+  { username: 'Marvin Stohs', password: 'Marina1' },
+  { username: 'Mitchel French', password: 'Marina1' },
+  { username: 'Leanne Layton', password: 'Marina1' }
 ];
 
 /**
