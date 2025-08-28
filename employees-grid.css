@@ -1,5 +1,5 @@
 /* Employees horizontal week grid (days on left, time across the top) */
-.emp-schedule { --row-h: 52px; --left-w: 110px; --head-h: 36px; --grid-line: rgba(0,0,0,.08); }
+.emp-schedule { --row-h: 52px; --left-w: 110px; --head-h: 40px; --grid-line: rgba(0,0,0,.12); }
 .emp-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
 .emp-toolbar .toolbar-left button { margin-right:6px; }
 .emp-toolbar #emp-title { font-weight:600; }
@@ -9,12 +9,13 @@
   border-radius: 10px;
   overflow: auto;
   position: relative;
+  background: #fff;
 }
 
 .emp-grid .head {
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 3;
   display: grid;
   grid-template-columns: var(--left-w) 1fr;
   background: #fff;
@@ -31,19 +32,34 @@
 .emp-grid .head .times {
   position: relative;
   height: var(--head-h);
+  overflow: hidden;
 }
 
+.emp-grid .times .tick {
+  position: absolute;
+  top: 0; bottom: 0;
+  transform: translateX(-50%);
+  display: block;
+}
+.emp-grid .times .vline {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: var(--grid-line);
+  transform: translateX(-50%);
+}
 .emp-grid .times .tick-label {
   position: absolute;
-  top: 0;
-  transform: translateX(-50%);
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%);
   font-size: 12px;
   color: #333;
+  background: #fff;
+  padding: 0 3px;
 }
 
-.emp-grid .body {
-  position: relative;
-}
+.emp-grid .body { position: relative; }
 
 .emp-grid .day-row {
   display: grid;
@@ -64,11 +80,15 @@
 
 .emp-grid .day-row .track {
   position: relative;
-  background-image:
-    linear-gradient(#fff, #fff),
-    repeating-linear-gradient(to right, var(--grid-line), var(--grid-line) 1px, transparent 1px, transparent 60px);
-  background-size: 100% 100%, 100% 100%;
-  background-position: 0 0, 0 0;
+  /* vertical guides rendered as absolutely positioned .vline elements */
+}
+
+.emp-grid .day-row .track .vline {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: var(--grid-line);
+  transform: translateX(-50%);
 }
 
 .emp-bar {

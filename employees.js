@@ -2,12 +2,11 @@
  * - Weekly grid: days as rows (left), hours across top
  * - Time off shown as horizontal bars
  * - Legend, modal, strict rules, admin totals/export preserved
- * - Optional roster sync from data/employees.json
  */
 
 ensureLoggedIn();
 
-// ===== Constants & Policy (unchanged) =====
+// ===== Constants & Policy =====
 const HOURS_PER_DAY = 8;
 const POLICY = {
   summer: { startMonth: 6, startDay: 1, endMonth: 9, endDay: 30, ptoCapDays: 3 },
@@ -17,12 +16,11 @@ const POLICY = {
 const TIME_OFF_KEY = 'timeOffRequests';
 const EMPLOYEES_KEY = 'employees';
 
-// Viewing window (07:00 → 16:00, 30-min granularity)
+// Viewing window (07:00 → 16:00)
 const VIEW_START = { h:7, m:0 };
 const VIEW_END   = { h:16, m:0 };
-const SLOT_MINUTES = 30;
 
-// ===== Admin / Current user helpers (same semantics) =====
+// ===== Admin / Current user helpers =====
 function isAdmin() {
   try { const p = new URLSearchParams(location.search); if (p.get('admin') === '1') return true; } catch {}
   return localStorage.getItem('currentUserIsAdmin') === 'true' || localStorage.getItem('isAdmin') === 'true';
@@ -31,7 +29,6 @@ function getCurrentUserId() { return localStorage.getItem('currentUserId') || lo
 
 // ===== Utils =====
 function ymd(d){ const dt=new Date(d); return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`; }
-function hm(date){ return `${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`; }
 function dayDiffInclusive(s,e){ const S=new Date(ymd(s)), E=new Date(ymd(e)); return Math.floor((E-S)/86400000)+1; }
 function hoursBetween(s,e){ return Math.max(0,(new Date(e)-new Date(s))/3600000); }
 function inSummerWindow(d){ const y=d.getFullYear(); const s=new Date(y,5,1), e=new Date(y,8,30,23,59,59,999); return d>=s && d<=e; }
@@ -43,9 +40,8 @@ function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 function getList(key){ try{ if(typeof getItems==='function') return getItems(key);}catch{} return JSON.parse(localStorage.getItem(key)||'[]'); }
 function setList(key,arr){ localStorage.setItem(key, JSON.stringify(arr||[])); }
 
-// ===== Data load & roster sync =====
+// ===== Data load & roster =====
 let EMPLOYEES = getList(EMPLOYEES_KEY);
-const TIME_OFF = getList(TIME_OFF_KEY);
 async function syncEmployeesFromFile(){
   try{
     const res=await fetch('data/employees.json',{cache:'no-store'});
@@ -59,19 +55,15 @@ function typeLabel(k){ return k==='PTO'?'PTO':k==='SICK'?'Sick':k; }
 
 // ===== Horizontal Grid Rendering =====
 let currentWeekStart = startOfWeek(new Date()); // Sunday of the current week
-const colorByType = { PTO:'#007F7E', SICK:'#E67E22' };
 
+function totalViewMinutes(){ return (VIEW_END.h - VIEW_START.h)*60 + (VIEW_END.m - VIEW_START.m); }
 function minutesSinceViewStart(date){
   const d=new Date(date);
   const start=new Date(d); start.setHours(VIEW_START.h, VIEW_START.m, 0, 0);
   const end=new Date(d); end.setHours(VIEW_END.h, VIEW_END.m, 0, 0);
   if(d<=start) return 0;
-  if(d>=end) return (VIEW_END.h - VIEW_START.h)*60 + (VIEW_END.m - VIEW_START.m);
+  if(d>=end) return totalViewMinutes();
   return Math.round((d - start)/60000);
-}
-
-function totalViewMinutes(){
-  return (VIEW_END.h - VIEW_START.h)*60 + (VIEW_END.m - VIEW_START.m);
 }
 
 function renderTitle(){
@@ -82,18 +74,33 @@ function renderTitle(){
   titleEl.textContent = `${fmt(start)} – ${fmt(end)}, ${end.getFullYear()}`;
 }
 
-function renderHeaderTicks(container){
+function renderHeader(container){
   container.innerHTML='';
   const totalMin = totalViewMinutes();
   for(let h=VIEW_START.h; h<=VIEW_END.h; h++){
     const leftPct = ((h - VIEW_START.h)*60)/totalMin*100;
-    const label=document.createElement('div');
-    label.className='tick-label';
-    label.style.left = leftPct+'%';
+    const tick=document.createElement('div');
+    tick.className='tick'; tick.style.left = leftPct+'%';
+    const vline=document.createElement('div'); vline.className='vline'; vline.style.left=leftPct+'%';
+    const lbl=document.createElement('div'); lbl.className='tick-label';
     const hour12 = ((h+11)%12)+1;
-    label.textContent = hour12 + (h<12?'a':'p');
-    container.appendChild(label);
+    lbl.textContent = hour12 + (h<12?'a':'p');
+    tick.appendChild(lbl);
+    container.appendChild(vline);
+    container.appendChild(tick);
   }
+  // Right boundary
+  const vRight=document.createElement('div'); vRight.className='vline'; vRight.style.left='100%'; container.appendChild(vRight);
+}
+
+function renderTrackGuides(trackEl){
+  const totalMin = totalViewMinutes();
+  for(let h=VIEW_START.h; h<=VIEW_END.h; h++){
+    const leftPct = ((h - VIEW_START.h)*60)/totalMin*100;
+    const vline=document.createElement('div'); vline.className='vline'; vline.style.left=leftPct+'%';
+    trackEl.appendChild(vline);
+  }
+  const vRight=document.createElement('div'); vRight.className='vline'; vRight.style.left='100%'; trackEl.appendChild(vRight);
 }
 
 function splitRequestIntoDailySegments(req){
@@ -118,7 +125,7 @@ function renderGrid(){
   head.className='head';
   const left=document.createElement('div'); left.className='left'; left.textContent='';
   const times=document.createElement('div'); times.className='times';
-  renderHeaderTicks(times);
+  renderHeader(times);
   head.appendChild(left); head.appendChild(times);
   wrap.appendChild(head);
 
@@ -137,8 +144,9 @@ function renderGrid(){
     label.innerHTML = `<div>${dow}<br>${dayDate.toLocaleDateString(undefined,{month:'numeric', day:'numeric'})}</div>`;
 
     const track=document.createElement('div'); track.className='track';
+    renderTrackGuides(track);
 
-    // Render bars for requests falling on this day
+    // Render bars for requests on this day
     const events = getList(TIME_OFF_KEY);
     events.forEach(req=>{
       splitRequestIntoDailySegments(req).forEach(seg=>{
@@ -156,9 +164,6 @@ function renderGrid(){
         bar.style.width= (w/totalMin*100)+'%';
         bar.title = `${typeLabel(req.kind)} • ${employeeName(req.employeeId)}\n${seg.start.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})} – ${seg.end.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}`;
         bar.textContent = `${typeLabel(req.kind)} – ${employeeName(req.employeeId)}`;
-        bar.onclick = ()=>{
-          alert(`${typeLabel(req.kind)} for ${employeeName(req.employeeId)}\n${new Date(req.startISO).toLocaleString()} → ${new Date(req.endISO).toLocaleString()}\nStatus: ${req.status || 'approved'}`);
-        };
         track.appendChild(bar);
       });
     });
@@ -173,19 +178,19 @@ function prevWeek(){ currentWeekStart = addDays(currentWeekStart, -7); renderTit
 function nextWeek(){ currentWeekStart = addDays(currentWeekStart, +7); renderTitle(); renderGrid(); }
 function todayWeek(){ currentWeekStart = startOfWeek(new Date()); renderTitle(); renderGrid(); }
 
-// ===== Legend (unchanged) =====
+// ===== Legend =====
 function renderLegend(){
   const listEl=document.getElementById('emp-legend-list'); listEl.innerHTML='';
   if(!EMPLOYEES.length){ listEl.innerHTML='<div>No employees found.</div>'; return; }
   EMPLOYEES.forEach(emp=>{
     const row=document.createElement('div'); row.className='legend-item';
-    const sw=document.createElement('span'); sw.className='legend-color'; sw.style.backgroundColor=emp.color||'#4577D5';
+    const sw=document.createElement('span'); sw.className='legend-color'; sw.style.display='inline-block'; sw.style.width='10px'; sw.style.height='10px'; sw.style.borderRadius='2px'; sw.style.marginRight='8px'; sw.style.backgroundColor=emp.color||'#4577D5';
     const label=document.createElement('span'); label.innerHTML=`<strong>${emp.name}</strong> &nbsp; <span style="opacity:.8">${emp.position||''}</span>`;
     row.appendChild(sw); row.appendChild(label); listEl.appendChild(row);
   });
 }
 
-// ===== Modal & Request handling (mostly unchanged) =====
+// ===== Modal & Request handling =====
 const modal={ el:document.getElementById('request-modal'), form:null };
 function openRequestModal(){
   populateRequestEmployees();
@@ -208,7 +213,47 @@ function populateRequestEmployees(){
 }
 function toggleTimeInputs(){ const full=document.getElementById('req-fullday').value==='yes'; document.getElementById('req-start-time').disabled=full; document.getElementById('req-end-time').disabled=full; }
 
-// ===== Strict rules & helpers (same as before) =====
+function handleRequestSubmit(ev){
+  ev.preventDefault();
+  const form = {
+    type: document.getElementById('req-type').value,
+    employeeId: document.getElementById('req-employee').value,
+    fullDay: document.getElementById('req-fullday').value === 'yes',
+    startDate: document.getElementById('req-start-date').value,
+    endDate: document.getElementById('req-end-date').value,
+    startTime: document.getElementById('req-start-time').value,
+    endTime: document.getElementById('req-end-time').value,
+    notes: document.getElementById('req-notes').value
+  };
+
+  const chk = strictCheckAndBuildRecord(form);
+  if (!chk.ok) {
+    alert('Not approved:\n' + chk.reasons.join('\n'));
+    return;
+  }
+
+  // Save
+  const list = getList(TIME_OFF_KEY);
+  list.push(chk.record);
+  setList(TIME_OFF_KEY, list);
+
+  // Deduct balances for PTO / SICK (if those fields are in roster)
+  const emp = EMPLOYEES.find(e => String(e.id) === String(chk.record.employeeId));
+  if (emp) {
+    if (chk.record.kind === 'PTO') {
+      emp.ptoHours = Math.max(0, Number(emp.ptoHours || 0) - Number(chk.record.hours || 0));
+    } else if (chk.record.kind === 'SICK') {
+      emp.pslHours = Math.max(0, Number(emp.pslHours || 0) - Number(chk.record.hours || 0));
+    }
+    localStorage.setItem(EMPLOYEES_KEY, JSON.stringify(EMPLOYEES));
+  }
+
+  closeRequestModal();
+  renderGrid();
+  renderAdminPanel();
+}
+
+// ===== Strict checks =====
 function strictCheckAndBuildRecord(form){
   const kind=form.type, employeeId=form.employeeId, full=form.fullDay;
   const startISO=new Date(`${form.startDate}T${full?'08:00':form.startTime}`).toISOString();
@@ -260,7 +305,7 @@ function countEmployeeSummerPTODays(employeeId, year){
   return total;
 }
 
-// ===== Admin Panel (unchanged) =====
+// ===== Admin Panel =====
 function renderAdminPanel(){
   const panel=document.getElementById('admin-panel');
   if(!isAdmin()){ panel.style.display='none'; return; }
@@ -293,7 +338,7 @@ function downloadText(fn, text){ const a=document.createElement('a'); a.href=URL
 function csvEscape(s){ s=String(s||''); if(s.includes(',')||s.includes('"')||s.includes('\n')) return '"'+s.replace(/"/g,'""')+'"'; return s; }
 function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
 
-// ===== Export week (no FullCalendar; use currentWeekStart) =====
+// ===== Export week =====
 function exportCurrentWeek(){
   const start=new Date(currentWeekStart), end=addDays(currentWeekStart,7);
   const events=getList(TIME_OFF_KEY).filter(r=>{ const s=new Date(r.startISO), e=new Date(r.endISO); return e>=start && s<end; });
