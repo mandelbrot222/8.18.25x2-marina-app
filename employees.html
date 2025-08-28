@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Employee Schedule</title>
     <link rel="stylesheet" href="style.css" />
-    <!-- FullCalendar -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <!-- Page-specific styles for the horizontal employee grid -->
+    <link rel="stylesheet" href="employees-grid.css" />
     <script src="common.js"></script>
   </head>
   <body>
@@ -20,8 +19,21 @@
       <h1>Employee Schedule</h1>
 
       <div class="schedule-layout">
-        <section class="calendar-container">
-          <div id="employee-calendar"></div>
+        <section class="calendar-container emp-schedule">
+          <!-- Toolbar -->
+          <div class="emp-toolbar">
+            <div class="toolbar-left">
+              <button id="emp-prev" aria-label="Previous week">◀</button>
+              <button id="emp-today">today</button>
+              <button id="emp-next" aria-label="Next week">▶</button>
+            </div>
+            <div class="toolbar-title" id="emp-title" aria-live="polite"></div>
+          </div>
+
+          <!-- Grid -->
+          <div class="emp-grid" id="emp-grid">
+            <!-- JS will render the header row (times) and the 7 day rows here -->
+          </div>
         </section>
 
         <aside class="sidebar">
