@@ -35,19 +35,8 @@
   overflow: hidden;
 }
 
-.emp-grid .times .tick {
-  position: absolute;
-  top: 0; bottom: 0;
-  transform: translateX(-50%);
-  display: block;
-}
-.emp-grid .times .vline {
-  position: absolute;
-  top: 0; bottom: 0;
-  width: 1px;
-  background: var(--grid-line);
-  transform: translateX(-50%);
-}
+.emp-grid .times .tick { position: absolute; top: 0; bottom: 0; transform: translateX(-50%); display: block; }
+.emp-grid .times .vline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--grid-line); transform: translateX(-50%); z-index: 1; }
 .emp-grid .times .tick-label {
   position: absolute;
   top: 50%;
@@ -57,6 +46,7 @@
   color: #333;
   background: #fff;
   padding: 0 3px;
+  z-index: 2; /* sit above grid lines */
 }
 
 .emp-grid .body { position: relative; }
@@ -78,18 +68,8 @@
   text-align:center;
 }
 
-.emp-grid .day-row .track {
-  position: relative;
-  /* vertical guides rendered as absolutely positioned .vline elements */
-}
-
-.emp-grid .day-row .track .vline {
-  position: absolute;
-  top: 0; bottom: 0;
-  width: 1px;
-  background: var(--grid-line);
-  transform: translateX(-50%);
-}
+.emp-grid .day-row .track { position: relative; }
+.emp-grid .day-row .track .vline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--grid-line); transform: translateX(-50%); }
 
 .emp-bar {
   position: absolute;

@@ -16,9 +16,9 @@ const POLICY = {
 const TIME_OFF_KEY = 'timeOffRequests';
 const EMPLOYEES_KEY = 'employees';
 
-// Viewing window (07:00 → 16:00)
+// Viewing window (07:00 → 18:00)
 const VIEW_START = { h:7, m:0 };
-const VIEW_END   = { h:16, m:0 };
+const VIEW_END   = { h:18, m:0 };
 
 // ===== Admin / Current user helpers =====
 function isAdmin() {
@@ -79,18 +79,25 @@ function renderHeader(container){
   const totalMin = totalViewMinutes();
   for(let h=VIEW_START.h; h<=VIEW_END.h; h++){
     const leftPct = ((h - VIEW_START.h)*60)/totalMin*100;
-    const tick=document.createElement('div');
-    tick.className='tick'; tick.style.left = leftPct+'%';
+    // vertical line at each hour
     const vline=document.createElement('div'); vline.className='vline'; vline.style.left=leftPct+'%';
+    container.appendChild(vline);
+
+    // centered label, with edge clamping for first/last hour
+    const tick=document.createElement('div'); tick.className='tick'; tick.style.left = leftPct+'%';
     const lbl=document.createElement('div'); lbl.className='tick-label';
     const hour12 = ((h+11)%12)+1;
     lbl.textContent = hour12 + (h<12?'a':'p');
+    if(h===VIEW_START.h){
+      lbl.style.transform = 'translate(0,-50%)';
+      lbl.style.textAlign = 'left';
+    } else if (h===VIEW_END.h){
+      lbl.style.transform = 'translate(-100%,-50%)';
+      lbl.style.textAlign = 'right';
+    }
     tick.appendChild(lbl);
-    container.appendChild(vline);
     container.appendChild(tick);
   }
-  // Right boundary
-  const vRight=document.createElement('div'); vRight.className='vline'; vRight.style.left='100%'; container.appendChild(vRight);
 }
 
 function renderTrackGuides(trackEl){
@@ -100,7 +107,6 @@ function renderTrackGuides(trackEl){
     const vline=document.createElement('div'); vline.className='vline'; vline.style.left=leftPct+'%';
     trackEl.appendChild(vline);
   }
-  const vRight=document.createElement('div'); vRight.className='vline'; vRight.style.left='100%'; trackEl.appendChild(vRight);
 }
 
 function splitRequestIntoDailySegments(req){
@@ -134,6 +140,7 @@ function renderGrid(){
   wrap.appendChild(body);
 
   const totalMin = totalViewMinutes();
+  const events = getList(TIME_OFF_KEY);
 
   for(let i=0;i<7;i++){
     const dayDate = addDays(currentWeekStart, i);
@@ -147,7 +154,6 @@ function renderGrid(){
     renderTrackGuides(track);
 
     // Render bars for requests on this day
-    const events = getList(TIME_OFF_KEY);
     events.forEach(req=>{
       splitRequestIntoDailySegments(req).forEach(seg=>{
         if(seg.day.toDateString() !== dayDate.toDateString()) return;
@@ -232,12 +238,10 @@ function handleRequestSubmit(ev){
     return;
   }
 
-  // Save
   const list = getList(TIME_OFF_KEY);
   list.push(chk.record);
   setList(TIME_OFF_KEY, list);
 
-  // Deduct balances for PTO / SICK (if those fields are in roster)
   const emp = EMPLOYEES.find(e => String(e.id) === String(chk.record.employeeId));
   if (emp) {
     if (chk.record.kind === 'PTO') {
@@ -257,7 +261,7 @@ function handleRequestSubmit(ev){
 function strictCheckAndBuildRecord(form){
   const kind=form.type, employeeId=form.employeeId, full=form.fullDay;
   const startISO=new Date(`${form.startDate}T${full?'08:00':form.startTime}`).toISOString();
-  const endISO=new Date(`${form.endDate}T${full?'16:00':form.endTime}`).toISOString();
+  const endISO=new Date(`${form.endDate}T${full?'18:00':form.endTime}`).toISOString(); // clamp UI default to 6p when full day
   if(new Date(endISO)<=new Date(startISO)) return {ok:false, reasons:['End must be after start']};
   const emp=EMPLOYEES.find(e=>String(e.id)===String(employeeId)); if(!emp) return {ok:false, reasons:['Employee not found']};
 
