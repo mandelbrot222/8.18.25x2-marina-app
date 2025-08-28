@@ -4,7 +4,6 @@
  * - Strict time-off rules:
  *    PTO: 14-day lead time, summer cap (3 days Jun 1–Sep 30), must have PTO hours
  *    SICK (WA PSL): allow only up to accrued sick hours; if >3 days, flag verification notice
- *    PFML: create record as 'pending' (manager processes offline)
  * - Admin panel: year totals (requested/approved/taken) by employee
  * - NEW: optional roster sync from data/employees.json (writes to localStorage)
  */
@@ -91,7 +90,7 @@ let empCalendar = null;
 function toCalendarEvents() {
   // Convert TIME_OFF records into FullCalendar events
   return getList(TIME_OFF_KEY).map(req => {
-    const colorByType = { PTO: '#007F7E', SICK: '#E67E22', PFML: '#8F4E9F' };
+    const colorByType = { PTO: '#007F7E', SICK: '#E67E22' };
     const title = `${typeLabel(req.kind)} - ${employeeName(req.employeeId)}`;
     return {
       title,
@@ -108,7 +107,6 @@ function toCalendarEvents() {
 function typeLabel(k) {
   if (k === 'PTO') return 'PTO';
   if (k === 'SICK') return 'Sick';
-  if (k === 'PFML') return 'PFML';
   return k;
 }
 
@@ -273,12 +271,8 @@ function strictCheckAndBuildRecord(form) {
     }
   }
 
-  // PFML: allow creating record but mark as pending (manager/ESD handling offline)
   let status = 'approved';
   let verificationNeeded = false;
-  if (kind === 'PFML') {
-    status = 'pending';
-  }
 
   // Sick > 3 days: verification may be requested (policy notice)
   if (kind === 'SICK') {
@@ -360,8 +354,7 @@ function drawAdminTotals(year) {
   EMPLOYEES.forEach(e => byEmp.set(String(e.id), {
     name: e.name, position: e.position || '',
     ptoReqH: 0, ptoAppH: 0, ptoTakenH: 0,
-    sickReqH: 0, sickAppH: 0, sickTakenH: 0,
-    pfmlReqH: 0, pfmlAppH: 0, pfmlTakenH: 0
+    sickReqH: 0, sickAppH: 0, sickTakenH: 0
   }));
 
   list.forEach(r => {
@@ -370,7 +363,8 @@ function drawAdminTotals(year) {
     const bucket = byEmp.get(k);
     const hrs = Number(r.hours || 0);
     const isPast = new Date(r.endISO) < new Date(); // taken if event ended already
-    const kindKey = r.kind === 'PTO' ? 'pto' : r.kind === 'SICK' ? 'sick' : 'pfml';
+    const kindKey = r.kind === 'PTO' ? 'pto' : r.kind === 'SICK' ? 'sick' : null;
+    if (!kindKey) return;
     bucket[`${kindKey}ReqH`] += hrs;
     if (r.status === 'approved') bucket[`${kindKey}AppH`] += hrs;
     if (isPast && r.status === 'approved') bucket[`${kindKey}TakenH`] += hrs;
@@ -384,9 +378,9 @@ function drawAdminTotals(year) {
     <div>Requested (hrs)</div><div>Approved (hrs)</div><div>Taken (hrs)</div>
   </div>`);
   byEmp.forEach(v => {
-    const req = v.ptoReqH + v.sickReqH + v.pfmlReqH;
-    const app = v.ptoAppH + v.sickAppH + v.pfmlAppH;
-    const tak = v.ptoTakenH + v.sickTakenH + v.pfmlTakenH;
+    const req = v.ptoReqH + v.sickReqH;
+    const app = v.ptoAppH + v.sickAppH;
+    const tak = v.ptoTakenH + v.sickTakenH;
     rows.push(`<div style="display:grid;grid-template-columns:1.2fr .8fr repeat(3,1fr);gap:6px;">
       <div>${escapeHtml(v.name)}</div><div>${escapeHtml(v.position)}</div>
       <div>${req.toFixed(1)}</div><div>${app.toFixed(1)}</div><div>${tak.toFixed(1)}</div>
@@ -483,7 +477,7 @@ function handleRequestSubmit(e) {
   closeRequestModal();
   refreshCalendar();
   if (isAdmin()) drawAdminTotals(new Date().getFullYear());
-  alert(rec.kind === 'PFML' ? 'Request recorded as pending (PFML).' : 'Request approved.');
+  alert('Request approved.');
 }
 
 // ===== Export Week =====
