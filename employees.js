@@ -86,22 +86,34 @@ async function syncEmployeesFromFile() {
 
 // ===== Calendar =====
 let empCalendar = null;
+const COLOR_BY_TYPE = { PTO: '#007F7E', SICK: '#E67E22' };
 
 function toCalendarEvents() {
-  // Convert TIME_OFF records into FullCalendar events
-  return getList(TIME_OFF_KEY).map(req => {
-    const colorByType = { PTO: '#007F7E', SICK: '#E67E22' };
+  // Split each time-off record into per-day events used by the timeline view
+  const events = [];
+  getList(TIME_OFF_KEY).forEach(req => {
     const title = `${typeLabel(req.kind)} - ${employeeName(req.employeeId)}`;
-    return {
-      title,
-      start: req.startISO,
-      end: req.endISO,
-      backgroundColor: colorByType[req.kind] || '#7A7A7A',
-      borderColor: colorByType[req.kind] || '#7A7A7A',
-      opacity: req.status === 'denied' ? 0.4 : 1,
-      extendedProps: { req }
-    };
+    const start = new Date(req.startISO);
+    const end = new Date(req.endISO);
+    const day = new Date(start);
+    day.setHours(0, 0, 0, 0);
+    while (day <= end) {
+      const segStart = day > start ? day : start;
+      const segEnd = new Date(Math.min(end, new Date(day.getFullYear(), day.getMonth(), day.getDate(), 23, 59, 59, 999)));
+      events.push({
+        title,
+        start: segStart.toISOString(),
+        end: segEnd.toISOString(),
+        backgroundColor: COLOR_BY_TYPE[req.kind] || '#7A7A7A',
+        borderColor: COLOR_BY_TYPE[req.kind] || '#7A7A7A',
+        opacity: req.status === 'denied' ? 0.4 : 1,
+        resourceId: ymd(day),
+        extendedProps: { req }
+      });
+      day.setDate(day.getDate() + 1);
+    }
   });
+  return events;
 }
 
 function typeLabel(k) {
@@ -115,24 +127,49 @@ function employeeName(id) {
   return e ? e.name : `Emp ${id}`;
 }
 
+function buildWeekResources(start) {
+  const res = [];
+  const d = new Date(start);
+  d.setHours(0, 0, 0, 0);
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(d);
+    const id = ymd(day);
+    res.push({ id });
+    d.setDate(d.getDate() + 1);
+  }
+  return res;
+}
+
 function initCalendar() {
   const el = document.getElementById('employee-calendar');
   if (!el) return;
   empCalendar = new FullCalendar.Calendar(el, {
-    initialView: 'timeGridWeek',
+    schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
+    initialView: 'resourceTimelineWeek',
     height: 'auto',
-    dayHeaderContent: (arg) => {
-      const dow = arg.date.toLocaleDateString([], { weekday: 'short' });
-      const m = String(arg.date.getMonth() + 1);
-      const d = String(arg.date.getDate());
+    resourceAreaHeaderContent: 'Day',
+    resourceAreaWidth: '80px',
+    resourceLabelContent: (arg) => {
+      const dt = new Date(arg.resource.id);
+      const dow = dt.toLocaleDateString([], { weekday: 'short' });
+      const m = String(dt.getMonth() + 1);
+      const d = String(dt.getDate());
       return { html: `<div class="nm-dow">${dow}</div><div class="nm-date">${m}/${d}</div>` };
     },
     headerToolbar: { left: 'prev,next today', center: 'title', right: '' },
     slotDuration: '00:30:00',
     slotMinTime: '07:00:00',
-    slotMaxTime: '16:00:00',
-    allDaySlot: false,
+    slotMaxTime: '18:00:00',
     events: toCalendarEvents(),
+    resources: buildWeekResources(new Date()),
+    datesSet: (info) => {
+      const resources = buildWeekResources(info.start);
+      empCalendar.batchRendering(() => {
+        empCalendar.getResources().forEach(r => r.remove());
+        resources.forEach(r => empCalendar.addResource(r));
+        refreshCalendar();
+      });
+    },
     eventClick: (info) => {
       const { req } = info.event.extendedProps;
       alert(`${typeLabel(req.kind)} for ${employeeName(req.employeeId)}\n`
