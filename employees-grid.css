@@ -1,0 +1,87 @@
+/* Employees horizontal week grid (days on left, time across the top) */
+.emp-schedule { --row-h: 52px; --left-w: 110px; --head-h: 36px; --grid-line: rgba(0,0,0,.08); }
+.emp-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
+.emp-toolbar .toolbar-left button { margin-right:6px; }
+.emp-toolbar #emp-title { font-weight:600; }
+
+.emp-grid {
+  border: 1px solid var(--grid-line);
+  border-radius: 10px;
+  overflow: auto;
+  position: relative;
+}
+
+.emp-grid .head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: var(--left-w) 1fr;
+  background: #fff;
+  border-bottom: 1px solid var(--grid-line);
+  height: var(--head-h);
+}
+
+.emp-grid .head .left {
+  display:flex; align-items:center; justify-content:center;
+  font-weight:600; color:#555;
+  border-right: 1px solid var(--grid-line);
+}
+
+.emp-grid .head .times {
+  position: relative;
+  height: var(--head-h);
+}
+
+.emp-grid .times .tick-label {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: #333;
+}
+
+.emp-grid .body {
+  position: relative;
+}
+
+.emp-grid .day-row {
+  display: grid;
+  grid-template-columns: var(--left-w) 1fr;
+  min-height: var(--row-h);
+  border-bottom: 1px solid var(--grid-line);
+  background: #fff;
+}
+
+.emp-grid .day-row .day-cell {
+  display:flex; align-items:center; justify-content:center;
+  border-right: 1px solid var(--grid-line);
+  font-weight:600;
+  color:#333;
+  padding: 4px 6px;
+  text-align:center;
+}
+
+.emp-grid .day-row .track {
+  position: relative;
+  background-image:
+    linear-gradient(#fff, #fff),
+    repeating-linear-gradient(to right, var(--grid-line), var(--grid-line) 1px, transparent 1px, transparent 60px);
+  background-size: 100% 100%, 100% 100%;
+  background-position: 0 0, 0 0;
+}
+
+.emp-bar {
+  position: absolute;
+  top: 6px;
+  height: calc(var(--row-h) - 12px);
+  border-radius: 8px;
+  opacity: 0.95;
+  display:flex; align-items:center; padding: 0 8px;
+  color: white; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  box-shadow: 0 1px 4px rgba(0,0,0,.12);
+}
+
+.emp-bar.sick { background: #E67E22; }
+.emp-bar.pto  { background: #007F7E; }
+.emp-bar.other{ background: #7A7A7A; }
