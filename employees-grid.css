@@ -85,3 +85,16 @@
 .emp-bar.sick { background: #E67E22; }
 .emp-bar.pto  { background: #007F7E; }
 .emp-bar.other{ background: #7A7A7A; }
+
+
+/* Baseline weekly shift bar (background layer) */
+.shift-bar{
+  position:absolute; top:10px; height:calc(var(--row-h) - 20px);
+  background: rgba(69, 119, 213, .15);
+  border: 1px solid rgba(69, 119, 213, .25);
+  border-radius:8px;
+  color:#2a4a85; font-size:12px; display:flex; align-items:center; padding:0 6px;
+  pointer-events:none; /* allow clicks to pass through to time-off bars */
+  z-index:0;
+}
+.emp-bar{ z-index:1; }
