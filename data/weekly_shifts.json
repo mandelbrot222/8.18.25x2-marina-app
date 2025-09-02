@@ -3,36 +3,6 @@
   "notes": "Weekly baseline shifts from spreadsheet; weekday: 0=Sun..6=Sat",
   "data": [
     {
-      "employeeName": "Haak Wagner",
-      "shifts": [
-        {
-          "weekday": 1,
-          "start": "07:30",
-          "end": "17:00"
-        },
-        {
-          "weekday": 2,
-          "start": "07:30",
-          "end": "17:00"
-        },
-        {
-          "weekday": 3,
-          "start": "07:30",
-          "end": "17:00"
-        },
-        {
-          "weekday": 4,
-          "start": "07:30",
-          "end": "17:00"
-        },
-        {
-          "weekday": 5,
-          "start": "07:30",
-          "end": "17:00"
-        }
-      ]
-    },
-    {
       "employeeName": "Karli Rich",
       "shifts": [
         {
