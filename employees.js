@@ -109,7 +109,12 @@ function minutesSinceViewStart(date){
   const end=new Date(d); end.setHours(VIEW_END.h, VIEW_END.m, 0, 0);
   if(d<=start) return 0;
   if(d>=end) return totalViewMinutes();
-  return Math.round((d - start)/60000);
+  // Use floor rather than round so a bar never spills past the
+  // requested end time due to rounding up. Rounding caused some
+  // shifts to display slightly beyond their actual end, e.g. showing
+  // a 5:00 pm shift as extending to 5:30 pm. Flooring keeps the bar
+  // strictly within the intended bounds.
+  return Math.floor((d - start)/60000);
 }
 
 function renderTitle(){
