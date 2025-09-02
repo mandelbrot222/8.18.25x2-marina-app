@@ -41,6 +41,25 @@ function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 function getList(key){ try{ if(typeof getItems==='function') return getItems(key);}catch{} return JSON.parse(localStorage.getItem(key)||'[]'); }
 function setList(key,arr){ localStorage.setItem(key, JSON.stringify(arr||[])); }
 
+// ---- Color helpers for shift bars ----
+function getEmployeeColorById(empId){
+  const emp = EMPLOYEES.find(e => String(e.id) === String(empId));
+  return emp && emp.color ? String(emp.color) : null;
+}
+function hexToRgba(hex, alpha){
+  if(!hex) return null;
+  let h = String(hex).trim();
+  if(h[0] === '#') h = h.slice(1);
+  if(h.length === 3){ h = h.split('').map(c=>c+c).join(''); }
+  if(!/^([0-9a-fA-F]{6})$/.test(h)) return hex; // fallback to original if not hex
+  const r = parseInt(h.slice(0,2),16);
+  const g = parseInt(h.slice(2,4),16);
+  const b = parseInt(h.slice(4,6),16);
+  const a = (alpha==null?1:alpha);
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+
+
 // ===== Data load & roster =====
 let EMPLOYEES = getList(EMPLOYEES_KEY);
 async function syncEmployeesFromFile(){
@@ -260,6 +279,12 @@ function renderGrid(){
           const label = empId ? employeeName(empId) : (person.employeeName||'');
           const laneIndex = empId ? laneIndexFor(empId) : laneIndexFor('name:'+label);
           bar.style.top = laneTopPx(laneIndex) + 'px';
+          // Apply employee color to baseline shift bar
+          const empColor = empId ? getEmployeeColorById(empId) : null;
+          if (empColor) {
+            bar.style.backgroundColor = hexToRgba(empColor, 0.20);
+            bar.style.borderColor = hexToRgba(empColor, 0.38);
+          }
           bar.title = `Shift • ${label} ${String(shift.start)}–${String(shift.end)}`;
           bar.textContent = label;
           track.appendChild(bar);
