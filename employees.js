@@ -1,8 +1,8 @@
-/* Employee Schedule page logic (horizontal week grid)
- * - Weekly grid: days as rows (left), hours across top
- * - Time off shown as horizontal bars
- * - Legend, modal, strict rules, admin totals/export preserved
- * - Baseline weekly shifts via data/weekly_shifts.json
+/* Employee Schedule page logic (horizontal week grid with stacking lanes)
+ * - Days are rows, hours across top (7a–6p)
+ * - Baseline weekly shifts (from data/weekly_shifts.json) render behind time-off
+ * - Time-off policy, admin totals/export preserved
+ * - NEW: per-day lane stacking so bars don't overlap
  */
 
 ensureLoggedIn();
@@ -17,7 +17,7 @@ const POLICY = {
 const TIME_OFF_KEY = 'timeOffRequests';
 const EMPLOYEES_KEY = 'employees';
 
-// Viewing window (07:00 → 18:00)
+// Time axis (07:00 → 18:00)
 const VIEW_START = { h:7, m:0 };
 const VIEW_END   = { h:18, m:0 };
 
@@ -129,6 +129,53 @@ function renderTrackGuides(trackEl){
   }
 }
 
+// ===== Lane helpers (stack bars per-employee within each day) =====
+function buildDayLanes(dayDate, events){
+  const ids = new Set();
+  // Collect from shifts
+  try{
+    (WEEKLY_SHIFTS.data||[]).forEach(person=>{
+      const empId = findEmployeeIdByNameCaseInsensitive(person.employeeName);
+      if(!empId) return;
+      (person.shifts||[]).forEach(shift=>{
+        if(Number(shift.weekday) === dayDate.getDay()) ids.add(String(empId));
+      });
+    });
+  }catch(_e){}
+  // Collect from requests with a segment that day
+  try{
+    events.forEach(req=>{
+      splitRequestIntoDailySegments(req).forEach(seg=>{
+        if(seg.day.toDateString() === dayDate.toDateString()){
+          ids.add(String(req.employeeId));
+        }
+      });
+    });
+  }catch(_e){}
+  // Stable order: by roster order
+  const order = new Map(EMPLOYEES.map((e,i)=>[String(e.id), i]));
+  const lanes = Array.from(ids);
+  lanes.sort((a,b)=> (order.get(String(a))??999) - (order.get(String(b))??999) || String(a).localeCompare(String(b)));
+  return lanes;
+}
+function laneMetrics(){
+  const root = document.querySelector('.emp-schedule');
+  const cs = root ? getComputedStyle(root) : null;
+  const laneH = cs ? parseFloat(cs.getPropertyValue('--lane-h')) : 24;
+  const gap   = cs ? parseFloat(cs.getPropertyValue('--lane-gap')) : 6;
+  const pad   = cs ? parseFloat(cs.getPropertyValue('--row-pad')) : 6;
+  return {laneH, gap, pad};
+}
+function laneTopPx(laneIndex){
+  const {laneH, gap, pad} = laneMetrics();
+  return Math.round(pad + laneIndex * (laneH + gap));
+}
+function trackHeightForLanes(count){
+  const {laneH, gap, pad} = laneMetrics();
+  if (count <= 0) return Math.round(pad*2 + laneH);
+  return Math.round(pad*2 + count*laneH + Math.max(0, count-1)*gap);
+}
+
 function splitRequestIntoDailySegments(req){
   const out=[];
   const s=new Date(req.startISO), e=new Date(req.endISO);
@@ -172,6 +219,10 @@ function renderGrid(){
     const track=document.createElement('div'); track.className='track';
     renderTrackGuides(track);
 
+    // Determine lanes and set track height
+    const lanes = buildDayLanes(dayDate, events);
+    track.style.height = trackHeightForLanes(lanes.length) + 'px';
+
     // Baseline weekly shifts (background)
     try{
       (WEEKLY_SHIFTS.data||[]).forEach(person=>{
@@ -192,6 +243,8 @@ function renderGrid(){
           bar.style.width= (w/totalMin*100)+'%';
           const empId = findEmployeeIdByNameCaseInsensitive(person.employeeName);
           const label = empId ? employeeName(empId) : (person.employeeName||'');
+          const laneIndex = empId ? Math.max(0, lanes.indexOf(String(empId))) : 0;
+          bar.style.top = laneTopPx(laneIndex) + 'px';
           bar.title = `Shift • ${label} ${String(shift.start)}–${String(shift.end)}`;
           bar.textContent = label;
           track.appendChild(bar);
@@ -199,7 +252,7 @@ function renderGrid(){
       });
     }catch(_e){}
 
-    // Time-off bars (overlay)
+    // Time-off bars (overlay in same lane as the employee)
     events.forEach(req=>{
       splitRequestIntoDailySegments(req).forEach(seg=>{
         if(seg.day.toDateString() !== dayDate.toDateString()) return;
@@ -214,6 +267,8 @@ function renderGrid(){
         bar.className='emp-bar ' + (kind==='PTO'?'pto':kind==='SICK'?'sick':'other');
         bar.style.left = (l/totalMin*100)+'%';
         bar.style.width= (w/totalMin*100)+'%';
+        const laneIndex = Math.max(0, lanes.indexOf(String(req.employeeId)));
+        bar.style.top = laneTopPx(laneIndex) + 'px';
         bar.title = `${typeLabel(req.kind)} • ${employeeName(req.employeeId)}\n${seg.start.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})} – ${seg.end.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}`;
         bar.textContent = `${typeLabel(req.kind)} – ${employeeName(req.employeeId)}`;
         track.appendChild(bar);
@@ -309,7 +364,7 @@ function handleRequestSubmit(ev){
 function strictCheckAndBuildRecord(form){
   const kind=form.type, employeeId=form.employeeId, full=form.fullDay;
   const startISO=new Date(`${form.startDate}T${full?'08:00':form.startTime}`).toISOString();
-  const endISO=new Date(`${form.endDate}T${full?'18:00':form.endTime}`).toISOString(); // full-day → clamp to 6p
+  const endISO=new Date(`${form.endDate}T${full?'18:00':form.endTime}`).toISOString();
   if(new Date(endISO)<=new Date(startISO)) return {ok:false, reasons:['End must be after start']};
   const emp=EMPLOYEES.find(e=>String(e.id)===String(employeeId)); if(!emp) return {ok:false, reasons:['Employee not found']};
 

@@ -1,5 +1,5 @@
 /* Employees horizontal week grid (days on left, time across the top) */
-.emp-schedule { --row-h: 52px; --left-w: 110px; --head-h: 40px; --grid-line: rgba(0,0,0,.12); }
+.emp-schedule { --row-h: 52px; --left-w: 110px; --head-h: 40px; --grid-line: rgba(0,0,0,.12); --lane-h: 24px; --lane-gap: 6px; --row-pad: 6px; }
 .emp-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
 .emp-toolbar .toolbar-left button { margin-right:6px; }
 .emp-toolbar #emp-title { font-weight:600; }
@@ -71,28 +71,28 @@
 .emp-grid .day-row .track { position: relative; }
 .emp-grid .day-row .track .vline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--grid-line); transform: translateX(-50%); }
 
-.emp-bar {
+/* Bars (height comes from --lane-h; vertical position is set inline in JS) */
+.emp-bar, .shift-bar {
   position: absolute;
-  top: 6px;
-  height: calc(var(--row-h) - 12px);
+  height: var(--lane-h);
   border-radius: 8px;
-  opacity: 0.95;
   display:flex; align-items:center; padding: 0 8px;
-  color: white; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  box-shadow: 0 1px 4px rgba(0,0,0,.12);
+  font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
+.emp-bar {
+  color: #fff;
+  opacity: 0.98;
+  box-shadow: 0 1px 4px rgba(0,0,0,.12);
+}
 .emp-bar.sick { background: #E67E22; }
 .emp-bar.pto  { background: #007F7E; }
 .emp-bar.other{ background: #7A7A7A; }
 
-/* Baseline weekly shift bar (background layer) */
 .shift-bar{
-  position:absolute; top:10px; height:calc(var(--row-h) - 20px);
-  background: rgba(69, 119, 213, .15);
-  border: 1px solid rgba(69, 119, 213, .25);
-  border-radius:8px;
-  color:#2a4a85; font-size:12px; display:flex; align-items:center; padding:0 6px;
+  background: rgba(69,119,213,.15);
+  border: 1px solid rgba(69,119,213,.25);
+  color:#2a4a85;
   pointer-events:none; /* allow clicks to pass through to time-off bars */
   z-index:0;
 }
