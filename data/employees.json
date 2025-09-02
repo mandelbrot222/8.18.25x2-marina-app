@@ -39,7 +39,7 @@
     "id": "E05",
     "name": "Marvin Stohs",
     "position": "Marina Repairs",
-    "color": "#F58220",
+    "color": "#FF0000",
     "ptoHours": 32,
     "pslHours": 24,
     "isActive": true
@@ -48,7 +48,7 @@
     "id": "E06",
     "name": "Mitchel French",
     "position": "Marina Repairs & Operations",
-    "color": "#F58220",
+    "color": "#FFFF00",
     "ptoHours": 32,
     "pslHours": 24,
     "isActive": true
@@ -57,7 +57,7 @@
     "id": "E07",
     "name": "Leanne Layton",
     "position": "Weekend Store Lead",
-    "color": "#F58220",
+    "color": "#996633",
     "ptoHours": 32,
     "pslHours": 24,
     "isActive": true
