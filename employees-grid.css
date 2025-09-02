@@ -86,7 +86,6 @@
 .emp-bar.pto  { background: #007F7E; }
 .emp-bar.other{ background: #7A7A7A; }
 
-
 /* Baseline weekly shift bar (background layer) */
 .shift-bar{
   position:absolute; top:10px; height:calc(var(--row-h) - 20px);
