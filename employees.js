@@ -109,7 +109,7 @@ function minutesSinceViewStart(date){
   const end=new Date(d); end.setHours(VIEW_END.h, VIEW_END.m, 0, 0);
   if(d<=start) return 0;
   if(d>=end) return totalViewMinutes();
-  return Math.round((d - start)/60000);
+  return (d - start)/60000; // float minutes for precise positioning
 }
 
 function renderTitle(){
@@ -266,8 +266,8 @@ function renderGrid(){
           const eParts = String(shift.end||'17:00').split(':');
           const segStart = new Date(dayDate); segStart.setHours(Number(sParts[0]||0), Number(sParts[1]||0), 0, 0);
           const segEnd   = new Date(dayDate); segEnd.setHours(Number(eParts[0]||0), Number(eParts[1]||0), 0, 0);
-          const leftMin = minutesSinceViewStart(segStart);
-          const rightMin= minutesSinceViewStart(segEnd);
+          const leftMin = Math.ceil(minutesSinceViewStart(segStart));
+          const rightMin= Math.floor(minutesSinceViewStart(segEnd));
           const l = clamp(leftMin, 0, totalMin);
           const w = clamp(rightMin, 0, totalMin) - l;
           if(w <= 0) return;
@@ -296,8 +296,8 @@ function renderGrid(){
     events.forEach(req=>{
       splitRequestIntoDailySegments(req).forEach(seg=>{
         if(seg.day.toDateString() !== dayDate.toDateString()) return;
-        const leftMin = minutesSinceViewStart(seg.start);
-        const rightMin= minutesSinceViewStart(seg.end);
+        const leftMin = Math.ceil(minutesSinceViewStart(seg.start));
+        const rightMin= Math.floor(minutesSinceViewStart(seg.end));
         const l = clamp(leftMin, 0, totalMin);
         const w = clamp(rightMin, 0, totalMin) - l;
         if(w <= 0) return;
