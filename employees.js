@@ -2,7 +2,7 @@
  * - Days are rows, hours across top (7a–6p)
  * - Baseline weekly shifts (from data/weekly_shifts.json) render behind time-off
  * - Time-off policy, admin totals/export preserved
- * - NEW: per-day lane stacking so bars don't overlap
+ * - Per-day lane stacking using a lane map to avoid overlaps
  */
 
 ensureLoggedIn();
@@ -72,6 +72,11 @@ function findEmployeeIdByNameCaseInsensitive(name){
   if(!name) return null;
   const norm = String(name).trim().toLowerCase();
   const hit = EMPLOYEES.find(e => String(e.name).trim().toLowerCase() === norm);
+  // Handle known misspelling for Bri just in case
+  if(!hit && norm.replace(/\s+/g,'') === 'brigalagher'){
+    const h2 = EMPLOYEES.find(e => String(e.name).trim().toLowerCase() === 'bri ghallager'.replace(/\s+/g,' '));
+    if(h2) return h2.id;
+  }
   return hit ? hit.id : null;
 }
 
@@ -222,6 +227,16 @@ function renderGrid(){
     // Determine lanes and set track height
     const lanes = buildDayLanes(dayDate, events);
     track.style.height = trackHeightForLanes(lanes.length) + 'px';
+    // Build lane map so everything (including any fallback) gets its own lane
+    const laneMap = new Map(lanes.map((id, idx) => [String(id), idx]));
+    function laneIndexFor(key){
+      const k = String(key);
+      if (laneMap.has(k)) return laneMap.get(k);
+      const idx = laneMap.size;
+      laneMap.set(k, idx);
+      track.style.height = trackHeightForLanes(laneMap.size) + 'px';
+      return idx;
+    }
 
     // Baseline weekly shifts (background)
     try{
@@ -243,7 +258,7 @@ function renderGrid(){
           bar.style.width= (w/totalMin*100)+'%';
           const empId = findEmployeeIdByNameCaseInsensitive(person.employeeName);
           const label = empId ? employeeName(empId) : (person.employeeName||'');
-          const laneIndex = empId ? Math.max(0, lanes.indexOf(String(empId))) : 0;
+          const laneIndex = empId ? laneIndexFor(empId) : laneIndexFor('name:'+label);
           bar.style.top = laneTopPx(laneIndex) + 'px';
           bar.title = `Shift • ${label} ${String(shift.start)}–${String(shift.end)}`;
           bar.textContent = label;
@@ -267,7 +282,7 @@ function renderGrid(){
         bar.className='emp-bar ' + (kind==='PTO'?'pto':kind==='SICK'?'sick':'other');
         bar.style.left = (l/totalMin*100)+'%';
         bar.style.width= (w/totalMin*100)+'%';
-        const laneIndex = Math.max(0, lanes.indexOf(String(req.employeeId)));
+        const laneIndex = laneIndexFor(req.employeeId);
         bar.style.top = laneTopPx(laneIndex) + 'px';
         bar.title = `${typeLabel(req.kind)} • ${employeeName(req.employeeId)}\n${seg.start.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})} – ${seg.end.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}`;
         bar.textContent = `${typeLabel(req.kind)} – ${employeeName(req.employeeId)}`;
