@@ -14,21 +14,23 @@
     <h2>Narrows Marina Portal</h2>
   </header>
 
-  <div class="container maintenance-layout">
-    <div class="open-section">
-      <div class="open-header">
-        <h1>Open Maintenance Requests</h1>
-        <button id="btn-new-request">Create Request</button>
+  <div class="container">
+    <div class="maintenance-layout">
+      <div class="open-section">
+        <div class="open-header">
+          <h1>Open Maintenance Requests</h1>
+          <button id="btn-new-request">Create Request</button>
+        </div>
+        <ul id="open-list" class="request-list open-list"></ul>
       </div>
-      <ul id="open-list" class="request-list open-list"></ul>
+      <div class="closed-section">
+        <h1>Recently Completed Maintenance Requests</h1>
+        <ul id="closed-list" class="request-list"></ul>
+      </div>
     </div>
-    <div class="closed-section">
-      <h1>Recently Completed Maintenance Requests</h1>
-      <ul id="closed-list" class="request-list"></ul>
-    </div>
-  </div>
 
-  <a href="menu.html" class="back-link">Back to Menu</a>
+    <a href="menu.html" class="back-link">Back to Menu</a>
+  </div>
 
   <!-- Modal to create a new request -->
   <div id="request-modal" class="modal" style="display:none;">
