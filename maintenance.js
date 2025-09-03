@@ -54,12 +54,24 @@ function renderOpen() {
   const list = getOpenList();
   if (!ul) return;
   ul.innerHTML = '';
-  list.forEach((item, idx) => {
+  for (let i = 0; i < 10; i++) {
     const li = document.createElement('li');
-    li.textContent = `${item.date} - ${item.description} (${item.priority})`;
-    li.addEventListener('click', () => openDetail(idx));
+    const num = document.createElement('span');
+    num.className = 'req-number';
+    num.textContent = `${i + 1}.`;
+    li.appendChild(num);
+
+    const text = document.createElement('span');
+    text.className = 'req-text';
+    const item = list[i];
+    if (item) {
+      text.textContent = `${formatDate(item.date)} - ${item.description} (${item.priority})`;
+      li.addEventListener('click', () => openDetail(i));
+      li.classList.add('clickable');
+    }
+    li.appendChild(text);
     ul.appendChild(li);
-  });
+  }
 }
 
 function renderClosed() {
@@ -67,11 +79,22 @@ function renderClosed() {
   const list = getClosedList();
   if (!ul) return;
   ul.innerHTML = '';
-  list.forEach(item => {
+  for (let i = 0; i < 10; i++) {
     const li = document.createElement('li');
-    li.textContent = `${item.date} - ${item.description} (${item.priority})`;
+    const num = document.createElement('span');
+    num.className = 'req-number';
+    num.textContent = `${i + 1}.`;
+    li.appendChild(num);
+
+    const text = document.createElement('span');
+    text.className = 'req-text';
+    const item = list[i];
+    if (item) {
+      text.textContent = `${formatDate(item.date)} - ${item.description} (${item.priority})`;
+    }
+    li.appendChild(text);
     ul.appendChild(li);
-  });
+  }
 }
 
 function openRequestModal() {
@@ -162,3 +185,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const detailComplete = document.getElementById('detail-complete');
   if (detailComplete) detailComplete.addEventListener('click', completeCurrent);
 });
+
+function formatDate(str) {
+  if (!str) return '';
+  const d = new Date(str);
+  if (isNaN(d)) return str;
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}

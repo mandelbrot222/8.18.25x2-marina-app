@@ -10,15 +10,6 @@
   flex: 1;
 }
 
-.open-section {
-  border-right: 2px solid var(--colour-primary);
-  padding-right: 20px;
-}
-
-.closed-section {
-  padding-left: 20px;
-}
-
 .open-header {
   display: flex;
   justify-content: space-between;
@@ -33,19 +24,39 @@
 }
 
 .request-list li {
-  background: var(--colour-card-bg);
-  border: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
   border-radius: 8px;
   padding: 10px;
   margin-bottom: 10px;
+  color: #ffffff;
 }
 
-.open-list li {
+.open-section .request-list li {
+  background: var(--colour-secondary);
+}
+
+.closed-section .request-list li {
+  background: var(--colour-primary);
+}
+
+.open-list li.clickable {
   cursor: pointer;
 }
 
-.open-list li:hover {
-  background: var(--colour-background);
+.open-list li.clickable:hover {
+  opacity: 0.9;
+}
+
+.req-number {
+  font-weight: 700;
+  margin-right: 8px;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.req-text {
+  flex: 1;
 }
 
 form textarea {
