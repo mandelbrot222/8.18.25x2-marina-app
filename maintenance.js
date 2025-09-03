@@ -1,45 +1,164 @@
 /*
- * Manage maintenance requests.  Records include a date, description
- * and priority.  Users can add new requests and remove them once
- * resolved.  This script interacts with localStorage via common.js.
+ * Maintenance Requests management
+ * - Displays open and recently completed requests
+ * - Allows creating new requests via modal
+ * - Clicking an open request shows details and option to mark complete
  */
 
 ensureLoggedIn();
 
-const MAINT_KEY = 'maintenanceRequests';
+const OPEN_KEY = 'maintenanceOpenRequests';
+const CLOSED_KEY = 'maintenanceClosedRequests';
 
-function renderMaintenance() {
-  const list = getItems(MAINT_KEY);
-  const ul = document.getElementById('maintenance-list');
+let EMPLOYEES = [];
+let currentIndex = null; // index of request currently viewed
+
+function getOpenList() {
+  return getItems(OPEN_KEY);
+}
+function setOpenList(list) {
+  localStorage.setItem(OPEN_KEY, JSON.stringify(list));
+}
+function getClosedList() {
+  return getItems(CLOSED_KEY);
+}
+function setClosedList(list) {
+  localStorage.setItem(CLOSED_KEY, JSON.stringify(list));
+}
+
+async function loadEmployees() {
+  try {
+    const res = await fetch('data/employees.json', { cache: 'no-store' });
+    if (res.ok) {
+      EMPLOYEES = await res.json();
+    }
+  } catch (e) {
+    console.warn('Employee list load failed', e);
+  }
+}
+
+function populateEmployeeDropdown() {
+  const sel = document.getElementById('req-employee');
+  if (!sel) return;
+  sel.innerHTML = '<option value="" disabled selected>Select employee</option>';
+  EMPLOYEES.forEach(emp => {
+    const opt = document.createElement('option');
+    opt.value = emp.name;
+    opt.textContent = emp.name;
+    sel.appendChild(opt);
+  });
+}
+
+function renderOpen() {
+  const ul = document.getElementById('open-list');
+  const list = getOpenList();
   if (!ul) return;
   ul.innerHTML = '';
-  list.forEach((item, index) => {
+  list.forEach((item, idx) => {
     const li = document.createElement('li');
-    li.textContent = `${item.date}: ${item.description} (Priority: ${item.priority})`;
-    const btn = document.createElement('button');
-    btn.textContent = 'Delete';
-    btn.addEventListener('click', () => {
-      deleteItem(MAINT_KEY, index);
-      renderMaintenance();
-    });
-    li.appendChild(btn);
+    li.textContent = `${item.date} - ${item.description} (${item.priority})`;
+    li.addEventListener('click', () => openDetail(idx));
     ul.appendChild(li);
   });
 }
 
-const form = document.getElementById('maintenance-form');
-if (form) {
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const newItem = {
-      date: document.getElementById('maintenance-date').value,
-      description: document.getElementById('maintenance-desc').value.trim(),
-      priority: document.getElementById('maintenance-priority').value
-    };
-    saveItem(MAINT_KEY, newItem);
-    form.reset();
-    renderMaintenance();
+function renderClosed() {
+  const ul = document.getElementById('closed-list');
+  const list = getClosedList();
+  if (!ul) return;
+  ul.innerHTML = '';
+  list.forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = `${item.date} - ${item.description} (${item.priority})`;
+    ul.appendChild(li);
   });
 }
 
-renderMaintenance();
+function openRequestModal() {
+  const modal = document.getElementById('request-modal');
+  if (modal) modal.style.display = 'flex';
+}
+function closeRequestModal() {
+  const modal = document.getElementById('request-modal');
+  if (modal) modal.style.display = 'none';
+  const form = document.getElementById('request-form');
+  if (form) form.reset();
+}
+
+function openDetail(index) {
+  const list = getOpenList();
+  const item = list[index];
+  if (!item) return;
+  currentIndex = index;
+  const container = document.getElementById('detail-content');
+  if (container) {
+    container.innerHTML = `
+      <p><strong>Employee:</strong> ${item.employee}</p>
+      ${item.customer ? `<p><strong>Customer:</strong> ${item.customer}</p>` : ''}
+      ${item.phone ? `<p><strong>Phone:</strong> ${item.phone}</p>` : ''}
+      <p><strong>Date:</strong> ${item.date}</p>
+      <p><strong>Description:</strong> ${item.description}</p>
+      <p><strong>Priority:</strong> ${item.priority}</p>
+      <p><strong>Location:</strong> ${item.location}</p>
+    `;
+  }
+  const modal = document.getElementById('detail-modal');
+  if (modal) modal.style.display = 'flex';
+}
+function closeDetail() {
+  const modal = document.getElementById('detail-modal');
+  if (modal) modal.style.display = 'none';
+  currentIndex = null;
+}
+
+function completeCurrent() {
+  if (currentIndex == null) return;
+  const openList = getOpenList();
+  const item = openList.splice(currentIndex, 1)[0];
+  setOpenList(openList);
+  const closed = getClosedList();
+  closed.unshift(item);
+  if (closed.length > 20) closed.length = 20;
+  setClosedList(closed);
+  closeDetail();
+  renderOpen();
+  renderClosed();
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadEmployees();
+  populateEmployeeDropdown();
+  renderOpen();
+  renderClosed();
+
+  const newBtn = document.getElementById('btn-new-request');
+  if (newBtn) newBtn.addEventListener('click', openRequestModal);
+
+  const cancelBtn = document.getElementById('req-cancel');
+  if (cancelBtn) cancelBtn.addEventListener('click', closeRequestModal);
+
+  const form = document.getElementById('request-form');
+  if (form) form.addEventListener('submit', e => {
+    e.preventDefault();
+    const item = {
+      employee: document.getElementById('req-employee').value,
+      customer: document.getElementById('req-customer').value.trim(),
+      phone: document.getElementById('req-phone').value.trim(),
+      date: document.getElementById('req-date').value,
+      description: document.getElementById('req-desc').value.trim(),
+      priority: document.getElementById('req-priority').value,
+      location: document.getElementById('req-location').value.trim()
+    };
+    const list = getOpenList();
+    list.push(item);
+    setOpenList(list);
+    closeRequestModal();
+    renderOpen();
+  });
+
+  const detailClose = document.getElementById('detail-close');
+  if (detailClose) detailClose.addEventListener('click', closeDetail);
+
+  const detailComplete = document.getElementById('detail-complete');
+  if (detailComplete) detailComplete.addEventListener('click', completeCurrent);
+});

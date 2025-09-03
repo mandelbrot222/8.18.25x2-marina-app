@@ -1,0 +1,59 @@
+/* Styles specific to the Maintenance Requests page */
+
+.maintenance-layout {
+  display: flex;
+  gap: 20px;
+}
+
+.open-section,
+.closed-section {
+  flex: 1;
+}
+
+.open-section {
+  border-right: 2px solid var(--colour-primary);
+  padding-right: 20px;
+}
+
+.closed-section {
+  padding-left: 20px;
+}
+
+.open-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.request-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.request-list li {
+  background: var(--colour-card-bg);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.open-list li {
+  cursor: pointer;
+}
+
+.open-list li:hover {
+  background: var(--colour-background);
+}
+
+form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 4px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
