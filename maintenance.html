@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Maintenance Requests</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="maintenance.css">
 </head>
 <body>
   <!-- Global header -->
@@ -14,29 +15,71 @@
   </header>
 
   <div class="container">
-    <h1>Maintenance Requests</h1>
-    <!-- Form to add a new maintenance request -->
-    <form id="maintenance-form">
-      <label for="maintenance-date">Date
-        <input type="date" id="maintenance-date" required>
-      </label>
-      <label for="maintenance-desc">Description
-        <input type="text" id="maintenance-desc" placeholder="Problem description" required>
-      </label>
-      <label for="maintenance-priority">Priority
-        <select id="maintenance-priority">
-          <option value="Low">Low</option>
-          <option value="Medium">Medium</option>
-          <option value="High">High</option>
-        </select>
-      </label>
-      <button type="submit">Add Request</button>
-    </form>
-
-    <!-- List of maintenance requests -->
-    <ul id="maintenance-list"></ul>
+    <div class="maintenance-layout">
+      <div class="open-section">
+        <div class="open-header">
+          <h1>Open Maintenance Requests</h1>
+          <button id="btn-new-request">Create Request</button>
+        </div>
+        <ul id="open-list" class="request-list open-list"></ul>
+      </div>
+      <div class="closed-section">
+        <h1>Recently Completed Maintenance Requests</h1>
+        <ul id="closed-list" class="request-list"></ul>
+      </div>
+    </div>
 
     <a href="menu.html" class="back-link">Back to Menu</a>
+  </div>
+
+  <!-- Modal to create a new request -->
+  <div id="request-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h3>Create Maintenance Request</h3>
+      <form id="request-form">
+        <label>Employee Creating Request
+          <select id="req-employee" required></select>
+        </label>
+        <label>Customer Name
+          <input type="text" id="req-customer">
+        </label>
+        <label>Customer Phone Number
+          <input type="tel" id="req-phone">
+        </label>
+        <label>Date
+          <input type="date" id="req-date" required>
+        </label>
+        <label>Description of Issue
+          <textarea id="req-desc" required></textarea>
+        </label>
+        <label>Priority Level
+          <select id="req-priority" required>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </label>
+        <label>Issue Location
+          <input type="text" id="req-location" required>
+        </label>
+        <div class="modal-buttons">
+          <button type="button" id="req-cancel">Cancel</button>
+          <button type="submit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal to view request details -->
+  <div id="detail-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h3>Maintenance Request</h3>
+      <div id="detail-content"></div>
+      <div class="modal-buttons">
+        <button type="button" id="detail-complete">Completed</button>
+        <button type="button" id="detail-close">Close</button>
+      </div>
+    </div>
   </div>
 
   <script src="common.js"></script>

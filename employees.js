@@ -408,8 +408,11 @@ function handleRequestSubmit(ev){
 // ===== Strict checks =====
 function strictCheckAndBuildRecord(form){
   const kind=form.type, employeeId=form.employeeId, full=form.fullDay;
-  const startISO=new Date(`${form.startDate}T${full?'08:00':form.startTime}`).toISOString();
-  const endISO=new Date(`${form.endDate}T${full?'18:00':form.endTime}`).toISOString();
+  // Use the full view span for full-day requests so the bar covers the entire day.
+  const fullStart=`${String(VIEW_START.h).padStart(2,'0')}:${String(VIEW_START.m).padStart(2,'0')}`;
+  const fullEnd=`${String(VIEW_END.h).padStart(2,'0')}:${String(VIEW_END.m).padStart(2,'0')}`;
+  const startISO=new Date(`${form.startDate}T${full?fullStart:form.startTime}`).toISOString();
+  const endISO=new Date(`${form.endDate}T${full?fullEnd:form.endTime}`).toISOString();
   if(new Date(endISO)<=new Date(startISO)) return {ok:false, reasons:['End must be after start']};
   const emp=EMPLOYEES.find(e=>String(e.id)===String(employeeId)); if(!emp) return {ok:false, reasons:['Employee not found']};
 
